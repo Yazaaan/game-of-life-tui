@@ -6,6 +6,7 @@
 int main(void){
   bool running = true;
   bool play = false;
+  Universe universe;
 
   while(running){
     int input = ui_get_input();
@@ -18,7 +19,7 @@ int main(void){
     }
 
     if(play){
-      time_step();
+      time_step(&universe);
     }
 
     usleep(60000);

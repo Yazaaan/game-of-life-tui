@@ -12,7 +12,7 @@ typedef struct{
   int height;
 } Universe;
 
-void time_step();
+void time_step(Universe* universe);
 
 #endif // !ENGINE
 

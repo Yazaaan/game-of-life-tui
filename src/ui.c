@@ -1,6 +1,6 @@
 #include <ncurses.h>
 #include <stdbool.h>
-#include "../include/ui.h"
+#include "../include/engine.h"
 
 void ui_init() {
   initscr();
