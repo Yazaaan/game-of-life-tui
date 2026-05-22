@@ -7,6 +7,7 @@ int main(void){
   bool running = true;
   bool play = false;
   Universe universe;
+  int simulationSpeed = 60000;
 
   while(running){
     int input = ui_get_input();
@@ -16,13 +17,20 @@ int main(void){
       break;
     case 'k':
       play = !play;
+      break;
+    case 'j':
+      simulationSpeed += 10000;
+      break;
+    case 'l':
+      simulationSpeed -= 10000;
+      break;
     }
 
     if(play){
       time_step(&universe);
     }
 
-    usleep(60000);
+    usleep(simulationSpeed);
   }
 
   ui_clear();
