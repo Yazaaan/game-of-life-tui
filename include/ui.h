@@ -1,4 +1,6 @@
 #include "../include/engine.h"
+#define GRID_START_X 2
+#define GRID_START_Y 5
 
 void ui_init();
 

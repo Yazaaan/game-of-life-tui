@@ -1,6 +1,7 @@
+#include "../include/ui.h"
+#include "../include/engine.h"
 #include <ncurses.h>
 #include <stdbool.h>
-#include "../include/engine.h"
 
 void ui_init() {
   initscr();
@@ -31,13 +32,17 @@ int ui_get_input() {
   return input;
 }
 
-void ui_draw(Universe* universe){
+void ui_draw(Universe *universe) {
   clear();
 
+  attron(A_REVERSE); // Highlight für die Info-Zeile
+  mvprintw(0, 0, "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate random | 'k' to play/pause | 'j' to slow down | 'l' to speed up");
+  attroff(A_REVERSE);
   // Spielfeld zeichnen
-  for(int y = 0; y < universe->height; y++){
-    for(int x = 0; x < universe->width; x++){
-      mvaddch(y, x, (universe->grid[y][x] == true)? '#' : ' ');
+  for (int y = 0; y < universe->height; y++) {
+    for (int x = 0; x < universe->width; x++) {
+      mvaddch(y + GRID_START_Y, x + GRID_START_X,
+              (universe->grid[y][x] == true) ? '#' : ' ');
     }
   }
 
