@@ -33,13 +33,15 @@ int count_Neighbours(Universe *universe, int y, int x) {
 }
 
 void time_step(Universe *universe) {
+  Universe past_universe = *universe;
+
   // Regeln durchsetzen
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {
-      int neighbours = count_Neighbours(universe, y, x);
+      int neighbours = count_Neighbours(&past_universe, y, x);
 
       // Jede lebendigebdende zelle die ...
-      if (universe->grid[y][x] == DEAD) {
+      if (past_universe.grid[y][x] == DEAD) {
         // ... weniger als 2 Nachbarn stribt
         if (neighbours < 2) {
           universe->grid[y][x] = DEAD;
