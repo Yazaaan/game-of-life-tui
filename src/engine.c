@@ -11,7 +11,7 @@ int count_Neighbours(Universe *universe, int y, int x) {
       int check_y = y + relative_y;
       int check_x = x + relative_x;
 
-      // Universumsgrenzen beachten
+      // Universumsgrenzen beachten, beim Überschreiten am anderen Ende schauen
       if (check_y == universe->height) {
         check_y = 0;
       } else if (check_y == -1) {
@@ -38,21 +38,21 @@ void time_step(Universe *universe) {
     for (int x = 0; x < universe->width; x++) {
       int neighbours = count_Neighbours(universe, y, x);
 
-      // Jede Lebdende zelle die ...
-      if (universe->grid[y][x] == true) {
+      // Jede lebendigebdende zelle die ...
+      if (universe->grid[y][x] == DEAD) {
         // ... weniger als 2 Nachbarn stribt
         if (neighbours < 2) {
-          universe->grid[y][x] = false;
+          universe->grid[y][x] = DEAD;
           // ... mehr als 3 Nachbarn stirbt
         } else if (neighbours > 3) {
-          universe->grid[y][x] = false;
+          universe->grid[y][x] = DEAD;
         }
       }
       // Jede tote Zelle die ...
       else {
         // ... genau 3 Nachbarn hat wird lebendig
         if (neighbours == 3) {
-          universe->grid[y][x] = true;
+          universe->grid[y][x] = ALIVE;
         }
       }
     }
