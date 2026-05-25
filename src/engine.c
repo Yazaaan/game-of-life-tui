@@ -71,7 +71,7 @@ void time_step(Universe *universe) {
       int neighbours = count_Neighbours(&past_universe, y, x);
 
       // Jede lebendigebdende zelle die ...
-      if (past_universe.grid[y][x] == DEAD) {
+      if (past_universe.grid[y][x] == ALIVE) {
         // ... weniger als 2 Nachbarn stribt
         if (neighbours < 2) {
           universe->grid[y][x] = DEAD;

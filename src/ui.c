@@ -3,6 +3,7 @@
 #include "../include/timing.h"
 #include <ncurses.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 char *message_ptr;
 
@@ -27,6 +28,7 @@ int ui_get_input() {
       int click_y = event.y;
 
       // Klick verarbeiten!!
+      sprintf(message_ptr, "X: %d | Y: %d", click_x, click_y);
 
       return 0;
     }

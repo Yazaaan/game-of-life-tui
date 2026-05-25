@@ -10,9 +10,9 @@ int main(void) {
   bool play = false;
   int simulationSpeed = 600;
   int newSpeed;
-  const int simulationSpeedIncrement = 100;
-  const int maxSpeed = 6000;
-  const int minSpeed = 100;
+  const int simulationSpeedIncrement = 25;
+  const int maxSpeed = 1000;
+  const int minSpeed = 25;
 
   long long lastUpdate = 0;
 
@@ -57,6 +57,7 @@ int main(void) {
 
     if (play) {
       if (currentTime - lastUpdate >= simulationSpeed) {
+        lastUpdate = millis();
         sprintf(message, "%d", testCount++);
         time_step(&universe);
       }
