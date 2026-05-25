@@ -4,7 +4,7 @@
 #include <ncurses.h>
 #include <stdbool.h>
 
-char* message_ptr; 
+char *message_ptr;
 
 void ui_init() {
   initscr();
@@ -35,7 +35,7 @@ int ui_get_input() {
   return input;
 }
 
-void ui_draw(Universe *universe, char msg[]) {
+void ui_draw(Universe *universe){
   // clear();
   erase();
 
@@ -44,7 +44,7 @@ void ui_draw(Universe *universe, char msg[]) {
            "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate "
            "random | 'k' to play/pause | 'j' to slow down | 'l' to speed up");
   attroff(A_REVERSE);
-  mvprintw(3, 0, "> %s", msg);
+  mvprintw(3, 0, "> %s", message_ptr);
   // Spielfeld zeichnen
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {
@@ -56,6 +56,4 @@ void ui_draw(Universe *universe, char msg[]) {
   refresh();
 }
 
-void ui_set_msg(char* msg_ptr) {
-  message_ptr = msg_ptr;
-}
+void ui_set_msg(char *msg_ptr) { message_ptr = msg_ptr; }

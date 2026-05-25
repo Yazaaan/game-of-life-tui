@@ -16,6 +16,8 @@ typedef struct{
 
 Universe get_empty_universe();
 
+void fill_universe_random(Universe *universe);
+
 void time_step(Universe* universe);
 
 #endif // !ENGINE

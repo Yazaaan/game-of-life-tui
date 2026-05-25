@@ -49,7 +49,9 @@ int main(void) {
         simulationSpeed = newSpeed;
       }
       sprintf(message, "Speed: %d", simulationSpeed);
-
+      break;
+    case 'r':
+      fill_universe_random(&universe);
       break;
     }
 
@@ -60,7 +62,7 @@ int main(void) {
       }
     }
 
-    ui_draw(&universe, message);
+    ui_draw(&universe);
 
     usleep(1000); // Eine Millisekunde warten, damit Schleife nicht konstant
                   // durchrast.

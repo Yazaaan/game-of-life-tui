@@ -1,16 +1,33 @@
 #include "../include/engine.h"
 #include <stdbool.h>
+#include <stdlib.h>
+#include <time.h>
 
 // Leeres Universum erzeugen in dem jede Zelle tot ist
-Universe get_empty_universe(){
+Universe get_empty_universe() {
   Universe universe;
+  universe.width = UNIVERSE_WIDTH;
+  universe.height = UNIVERSE_HEIGHT;
+
   for (int y = 0; y < UNIVERSE_HEIGHT; y++) {
-    for(int x = 0; x < UNIVERSE_WIDTH; x++){
+    for (int x = 0; x < UNIVERSE_WIDTH; x++) {
       universe.grid[y][x] = DEAD;
     }
   }
-  universe.grid[10][10] = ALIVE;
   return universe;
+}
+
+void fill_universe_random(Universe *universe) {
+  srand(time(NULL));
+
+  for (int y = 0; y < UNIVERSE_HEIGHT; y++) {
+    for (int x = 0; x < UNIVERSE_WIDTH; x++) {
+      universe->grid[y][x] = ALIVE;
+      int r = rand() % 3;
+      int ergebnis = (r < 2) ? 0 : 1;
+      universe->grid[y][x] = ergebnis;
+    }
+  }
 }
 
 int count_Neighbours(Universe *universe, int y, int x) {
@@ -18,7 +35,8 @@ int count_Neighbours(Universe *universe, int y, int x) {
 
   for (int relative_y = -1; relative_y <= 1; relative_y++) {
     for (int relative_x = -1; relative_x <= 1; relative_x++) {
-      if(relative_x == 0 && relative_y == 0) continue;
+      if (relative_x == 0 && relative_y == 0)
+        continue;
 
       int check_y = y + relative_y;
       int check_x = x + relative_x;
