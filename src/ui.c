@@ -32,12 +32,13 @@ int ui_get_input() {
   return input;
 }
 
-void ui_draw(Universe *universe) {
+void ui_draw(Universe *universe, char msg[]) {
   clear();
 
   attron(A_REVERSE); // Highlight für die Info-Zeile
   mvprintw(0, 0, "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate random | 'k' to play/pause | 'j' to slow down | 'l' to speed up");
   attroff(A_REVERSE);
+  mvprintw(3, 0, "> %s", msg);
   // Spielfeld zeichnen
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {

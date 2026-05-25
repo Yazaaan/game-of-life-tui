@@ -8,4 +8,4 @@ void ui_cleanup();
 
 int ui_get_input();
 
-void ui_draw(Universe* universe);
+void ui_draw(Universe* universe, char msg[]);

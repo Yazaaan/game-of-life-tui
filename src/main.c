@@ -1,12 +1,18 @@
 #include "../include/engine.h"
 #include "../include/ui.h"
 #include <stdbool.h>
+#include <string.h>
 #include <unistd.h>
 
 int main(void) {
   bool running = true;
   bool play = false;
+  char message[30] = "";
   int simulationSpeed = 60000;
+  int newSpeed;
+  const int simulationSpeedIncrement = 10000;
+  const int maxSpeed = 600000;
+  const int minSpeed = 10000;
 
   Universe universe = get_empty_universe();
 
@@ -20,16 +26,25 @@ int main(void) {
       break;
     case 'k':
       play = !play;
+        strcpy(message, (play)? "Simulating" : "Stop");
       break;
     case 'j':
-      simulationSpeed += 10000;
+      newSpeed = simulationSpeed - simulationSpeedIncrement;
+      if (newSpeed < maxSpeed) {
+        simulationSpeed = newSpeed;
+      }
+      strcpy(message, "down");
       break;
     case 'l':
-      simulationSpeed -= 10000;
+      newSpeed = simulationSpeed + simulationSpeedIncrement;
+      if (newSpeed > minSpeed) {
+        simulationSpeed = newSpeed;
+      }
+      strcpy(message, "up");
       break;
     }
 
-    ui_draw(&universe);
+    ui_draw(&universe, message);
 
     if (play) {
       time_step(&universe);
