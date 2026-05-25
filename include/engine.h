@@ -14,6 +14,8 @@ typedef struct{
   int height;
 } Universe;
 
+Universe get_empty_universe();
+
 void time_step(Universe* universe);
 
 #endif // !ENGINE

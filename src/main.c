@@ -1,7 +1,6 @@
 #include "../include/engine.h"
 #include "../include/ui.h"
 #include <stdbool.h>
-#include <stdio.h>
 #include <unistd.h>
 
 int main(void) {
@@ -9,7 +8,7 @@ int main(void) {
   bool play = false;
   int simulationSpeed = 60000;
 
-  Universe universe;
+  Universe universe = get_empty_universe();
 
   ui_init();
 

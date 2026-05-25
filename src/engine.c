@@ -1,6 +1,17 @@
 #include "../include/engine.h"
 #include <stdbool.h>
 
+// Leeres Universum erzeugen in dem jede Zelle tot ist
+Universe get_empty_universe(){
+  Universe universe;
+  for (int y = 0; y < UNIVERSE_HEIGHT; y++) {
+    for(int x = 0; x < UNIVERSE_WIDTH; x++){
+      universe.grid[y][x] = DEAD;
+    }
+  }
+  return universe;
+}
+
 int count_Neighbours(Universe *universe, int y, int x) {
   int count = 0;
 
@@ -33,7 +44,7 @@ int count_Neighbours(Universe *universe, int y, int x) {
 }
 
 void time_step(Universe *universe) {
-  Universe past_universe = *universe;
+  Universe past_universe = *universe; // Letztes Universum kopieren
 
   // Regeln durchsetzen
   for (int y = 0; y < universe->height; y++) {
