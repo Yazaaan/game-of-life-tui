@@ -9,6 +9,7 @@ Universe get_empty_universe(){
       universe.grid[y][x] = DEAD;
     }
   }
+  universe.grid[10][10] = ALIVE;
   return universe;
 }
 

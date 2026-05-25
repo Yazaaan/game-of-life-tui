@@ -1,6 +1,7 @@
 #include "../include/engine.h"
 #include "../include/ui.h"
 #include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -26,21 +27,22 @@ int main(void) {
       break;
     case 'k':
       play = !play;
-        strcpy(message, (play)? "Simulating" : "Stop");
+      strcpy(message, (play) ? "Simulating" : "Stop");
       break;
     case 'j':
       newSpeed = simulationSpeed - simulationSpeedIncrement;
-      if (newSpeed < maxSpeed) {
+      if (newSpeed >= minSpeed) {
         simulationSpeed = newSpeed;
       }
-      strcpy(message, "down");
+      sprintf(message, "Speed: %d", simulationSpeed);
       break;
     case 'l':
       newSpeed = simulationSpeed + simulationSpeedIncrement;
-      if (newSpeed > minSpeed) {
+      if (newSpeed <= maxSpeed) {
         simulationSpeed = newSpeed;
       }
-      strcpy(message, "up");
+      sprintf(message, "Speed: %d", simulationSpeed);
+
       break;
     }
 
