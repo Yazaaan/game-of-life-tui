@@ -1,7 +1,10 @@
 #include "../include/ui.h"
 #include "../include/engine.h"
+#include "../include/timing.h"
 #include <ncurses.h>
 #include <stdbool.h>
+
+char* message_ptr; 
 
 void ui_init() {
   initscr();
@@ -33,10 +36,13 @@ int ui_get_input() {
 }
 
 void ui_draw(Universe *universe, char msg[]) {
-  clear();
+  // clear();
+  erase();
 
   attron(A_REVERSE); // Highlight für die Info-Zeile
-  mvprintw(0, 0, "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate random | 'k' to play/pause | 'j' to slow down | 'l' to speed up");
+  mvprintw(0, 0,
+           "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate "
+           "random | 'k' to play/pause | 'j' to slow down | 'l' to speed up");
   attroff(A_REVERSE);
   mvprintw(3, 0, "> %s", msg);
   // Spielfeld zeichnen
@@ -48,4 +54,8 @@ void ui_draw(Universe *universe, char msg[]) {
   }
 
   refresh();
+}
+
+void ui_set_msg(char* msg_ptr) {
+  message_ptr = msg_ptr;
 }

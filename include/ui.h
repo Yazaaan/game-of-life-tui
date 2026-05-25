@@ -9,3 +9,5 @@ void ui_cleanup();
 int ui_get_input();
 
 void ui_draw(Universe* universe, char msg[]);
+
+void ui_set_msg(char* msg_ptr);

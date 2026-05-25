@@ -1,8 +1,8 @@
 CFLAGS = -Wall -Iinclude
 LDFLAGS = -lncurses
 
-compile: main.o ui.o engine.o
-	gcc main.o ui.o engine.o -o game_of_life $(LDFLAGS)
+compile: main.o ui.o engine.o timing.o
+	gcc main.o ui.o engine.o timing.o -o game_of_life $(LDFLAGS)
 
 main.o: src/main.c include/engine.h
 	gcc $(CFLAGS) -c src/main.c -o main.o
@@ -12,6 +12,9 @@ ui.o: src/ui.c include/ui.h include/engine.h
 
 engine.o: src/engine.c include/engine.h
 	gcc $(CFLAGS) -c src/engine.c -o engine.o
+
+timing.o: src/timing.c include/timing.h
+	gcc $(CFLAGS) -c src/timing.c -o timing.o
 
 clean:
 	rm -f *.o game_of_life lib/unity/unity.o
