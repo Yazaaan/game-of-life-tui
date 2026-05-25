@@ -53,6 +53,10 @@ int main(void) {
     case 'r':
       fill_universe_random(&universe);
       break;
+    case 'c':
+      universe = get_empty_universe();
+      ui_draw(&universe);
+      break;
     }
 
     if (play) {
