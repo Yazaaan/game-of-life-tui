@@ -1,15 +1,19 @@
-#include "../include/ui.h"
 #include "../include/engine.h"
+#include "../include/ui.h"
 #include <stdbool.h>
+#include <stdio.h>
 #include <unistd.h>
 
-int main(void){
+int main(void) {
   bool running = true;
   bool play = false;
-  Universe universe;
   int simulationSpeed = 60000;
 
-  while(running){
+  Universe universe;
+
+  ui_init();
+
+  while (running) {
     int input = ui_get_input();
     switch (input) {
     case 'q':
@@ -26,13 +30,15 @@ int main(void){
       break;
     }
 
-    if(play){
+    ui_draw(&universe);
+
+    if (play) {
       time_step(&universe);
     }
 
     usleep(simulationSpeed);
   }
 
-  ui_clear();
+  ui_cleanup();
   return 0;
 }

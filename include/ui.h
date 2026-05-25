@@ -4,7 +4,7 @@
 
 void ui_init();
 
-void ui_clear();
+void ui_cleanup();
 
 int ui_get_input();
 

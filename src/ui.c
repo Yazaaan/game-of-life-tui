@@ -42,7 +42,7 @@ void ui_draw(Universe *universe) {
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {
       mvaddch(y + GRID_START_Y, x + GRID_START_X,
-              (universe->grid[y][x] == true) ? '#' : ' ');
+              (universe->grid[y][x] == ALIVE) ? '#' : ' ');
     }
   }
 

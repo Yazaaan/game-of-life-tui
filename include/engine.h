@@ -5,6 +5,8 @@
 
 #define UNIVERSE_WIDTH 150
 #define UNIVERSE_HEIGHT 50
+#define ALIVE 1
+#define DEAD 0
 
 typedef struct{
   bool grid[UNIVERSE_HEIGHT][UNIVERSE_WIDTH];
