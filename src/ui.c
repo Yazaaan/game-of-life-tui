@@ -5,39 +5,62 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-char *message_ptr;
-
-void ui_init() {
+void ui_init(GameState *settings) {
   initscr();
   noecho();
   cbreak();
   nodelay(stdscr, TRUE);
   keypad(stdscr, TRUE);
   curs_set(0);
+
+  settings->running = true;
+  settings->play = false;
+  settings->simulationSpeed = 600;
+  settings->frameCount = 0;
+  sprintf(settings->message, "%s", "");
 }
 
 void ui_cleanup() { endwin(); }
 
-int ui_get_input() {
+void ui_input_process_keyboard(GameState *state) {
   int input = getch();
-  MEVENT event;
+  int newSpeed = 0;
 
-  if (input == KEY_MOUSE) {
-    if (getmouse(&event) == OK) {
-      int click_x = event.x;
-      int click_y = event.y;
-
-      // Klick verarbeiten!!
-      sprintf(message_ptr, "X: %d | Y: %d", click_x, click_y);
-
-      return 0;
+  switch (input) {
+  case 'q':
+    state->running = false;
+    break;
+  case 'k':
+    state->play = !state->play;
+    sprintf(state->message, "%s", (state->play) ? "Simulating" : "Stop");
+    break;
+  case 'j':
+    newSpeed = state->simulationSpeed + SPEED_INCREMENT;
+    if (newSpeed <= MAX_SPEED) {
+      state->simulationSpeed = newSpeed;
     }
+    sprintf(state->message, "Speed: %d", state->simulationSpeed);
+    break;
+  case 'l':
+    newSpeed = state->simulationSpeed - SPEED_INCREMENT;
+    if (newSpeed >= MIN_SPEED) {
+      state->simulationSpeed = newSpeed;
+    }
+    sprintf(state->message, "Speed: %d", state->simulationSpeed);
+    break;
+  case 'r':
+    fill_universe_random(&state->universe);
+    state->frameCount = 0;
+    break;
+  case 'c':
+    state->universe = get_empty_universe();
+    state->frameCount = 0;
+    ui_draw(state);
+    break;
   }
-
-  return input;
 }
 
-void ui_draw(Universe *universe){
+void ui_draw(GameState *game) {
   // clear();
   erase();
 
@@ -46,16 +69,14 @@ void ui_draw(Universe *universe){
            "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate "
            "random | 'k' to play/pause | 'j' to slow down | 'l' to speed up");
   attroff(A_REVERSE);
-  mvprintw(3, 0, "> %s", message_ptr);
+  mvprintw(3, 0, "> %s", game->message);
   // Spielfeld zeichnen
-  for (int y = 0; y < universe->height; y++) {
-    for (int x = 0; x < universe->width; x++) {
+  for (int y = 0; y < game->universe.height; y++) {
+    for (int x = 0; x < game->universe.width; x++) {
       mvaddch(y + GRID_START_Y, x + GRID_START_X,
-              (universe->grid[y][x] == ALIVE) ? '#' : ' ');
+              (game->universe.grid[y][x] == ALIVE) ? '#' : ' ');
     }
   }
 
   refresh();
 }
-
-void ui_set_msg(char *msg_ptr) { message_ptr = msg_ptr; }

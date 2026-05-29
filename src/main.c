@@ -2,72 +2,28 @@
 #include "../include/timing.h"
 #include "../include/ui.h"
 #include <stdbool.h>
-#include <stdio.h>
 #include <unistd.h>
 
 int main(void) {
-  bool running = true;
-  bool play = false;
-  int simulationSpeed = 600;
-  int newSpeed;
-  const int simulationSpeedIncrement = 25;
-  const int maxSpeed = 1000;
-  const int minSpeed = 25;
-
+  GameState game;
+  game.universe = get_empty_universe();
   long long lastUpdate = 0;
 
-  int testCount = 0;
+  ui_init(&game);
 
-  Universe universe = get_empty_universe();
-
-  ui_init();
-  char message[30] = "";
-  ui_set_msg(message);
-
-  while (running) {
+  while (game.running) {
     long long currentTime = millis();
-    int input = ui_get_input();
+    ui_input_process_keyboard(&game);
 
-    switch (input) {
-    case 'q':
-      running = false;
-      break;
-    case 'k':
-      play = !play;
-      sprintf(message, "%s", (play) ? "Simulating" : "Stop");
-      break;
-    case 'j':
-      newSpeed = simulationSpeed + simulationSpeedIncrement;
-      if (newSpeed <= maxSpeed) {
-        simulationSpeed = newSpeed;
-      }
-      sprintf(message, "Speed: %d", simulationSpeed);
-      break;
-    case 'l':
-      newSpeed = simulationSpeed - simulationSpeedIncrement;
-      if (newSpeed >= minSpeed) {
-        simulationSpeed = newSpeed;
-      }
-      sprintf(message, "Speed: %d", simulationSpeed);
-      break;
-    case 'r':
-      fill_universe_random(&universe);
-      break;
-    case 'c':
-      universe = get_empty_universe();
-      ui_draw(&universe);
-      break;
-    }
-
-    if (play) {
-      if (currentTime - lastUpdate >= simulationSpeed) {
+    if (game.play) {
+      if (currentTime - lastUpdate >= game.simulationSpeed) {
         lastUpdate = millis();
-        sprintf(message, "%d", testCount++);
-        time_step(&universe);
+        game.frameCount++;
+        time_step(&game.universe);
       }
     }
 
-    ui_draw(&universe);
+    ui_draw(&game);
 
     usleep(1000); // Eine Millisekunde warten, damit Schleife nicht konstant
                   // durchrast.
