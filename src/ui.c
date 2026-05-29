@@ -14,11 +14,7 @@ void ui_init(GameState *settings) {
   keypad(stdscr, TRUE);
   curs_set(0);
   mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-  printf("\033[?1003h"); // Aktiviert das Senden ALLER Mausbewegungen an das
-                         // Terminal
-  // mousemask(BUTTON1_PRESSED | BUTTON4_PRESSED | BUTTON5_PRESSED, NULL);
   mouseinterval(0);
-  set_escdelay(25);
 
   settings->running = true;
   settings->play = false;
@@ -28,10 +24,7 @@ void ui_init(GameState *settings) {
   ui_draw(settings);
 }
 
-void ui_cleanup() {
-  endwin();
-  printf("\033[?1003l");
-}
+void ui_cleanup() { endwin(); }
 
 void adjust_simulation_speed(GameState *game, int adjustment) {
   int newSpeed = game->simulationSpeed + adjustment;
@@ -72,43 +65,51 @@ void ui_input_process_keyboard(GameState *state, int input) {
 }
 
 void ui_input_process_mouse(GameState *game, MEVENT *mouse_event) {
-  game->play = false;
-  sprintf(game->message, "%s", "Stoppe zum Bearbeiten");
+  // Mausrad nach oben
+  if (mouse_event->bstate & BUTTON4_PRESSED) {
+    adjust_simulation_speed(game, -SPEED_INCREMENT);
+  }
 
-  int click_y = mouse_event->y - GRID_START_Y;
-  int click_x = mouse_event->x - GRID_START_X;
+  // Mausrad nach unten
+  if (mouse_event->bstate & BUTTON5_PRESSED) {
+    adjust_simulation_speed(game, SPEED_INCREMENT);
+  }
 
-  snprintf(game->message, 64, "X: %d | Y: %d", click_x, click_y);
+  // Linksklick
+  if (mouse_event->bstate & BUTTON1_PRESSED) {
+    game->play = false;
+    sprintf(game->message, "%s", "Stoppe zum Bearbeiten");
 
-  if (click_y <= game->universe.height && click_y >= 0 &&
-      click_x <= game->universe.width && click_x >= 0) {
-    bool *cell = &game->universe.grid[click_y][click_x];
+    // Mausposition im Gitter speichern
+    int click_y = mouse_event->y - GRID_START_Y;
+    int click_x = mouse_event->x - GRID_START_X;
 
-    *cell = !*cell;
+    if (click_y < game->universe.height && click_y >= 0 &&
+        click_x < game->universe.width && click_x >= 0) {
+      bool *cell = &game->universe.grid[click_y][click_x];
+      *cell = !*cell;
+
+      snprintf(game->message, 128,
+               "Editing mode: changed cell at x:%d, y:%d to %s", click_x,
+               click_y, (*cell) ? "alive" : "dead");
+    } else {
+
+      snprintf(game->message, 128, "Editing mode: out of bounds at x:%d, y:%d",
+               click_x, click_y);
+    }
   }
 }
 
 void ui_process_input(GameState *game) {
   int input = getch(); // Hole den Input
 
+  // Mauseingabe verarbeiten
   if (input == KEY_MOUSE) {
     MEVENT mouse_event;
     if (getmouse(&mouse_event) == OK) {
-      // Mausrad nach oben
-      if (mouse_event.bstate & BUTTON4_PRESSED) {
-        adjust_simulation_speed(game, -SPEED_INCREMENT);
-      }
-
-      // Mausrad nach unten
-      if (mouse_event.bstate & BUTTON5_PRESSED) {
-        adjust_simulation_speed(game, SPEED_INCREMENT);
-      }
-
-      // Linksklick
-      if (mouse_event.bstate & BUTTON1_PRESSED) {
-        ui_input_process_mouse(game, &mouse_event);
-      }
+      ui_input_process_mouse(game, &mouse_event);
     }
+    // Tastatureingabe verarbeiten
   } else if (input != ERR) {
     ui_input_process_keyboard(game, input);
   }
@@ -123,7 +124,8 @@ void ui_draw(GameState *game) {
   attron(A_REVERSE); // Highlight für die Info-Zeile
   mvprintw(0, 0,
            "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate "
-           "random | 'k' to play/pause | 'j' to slow down | 'l' to speed up");
+           "random | 'k' to play/pause | 'j' to slow down | 'l' to speed up | "
+           "left mouse button to edit | scroll mouse wheel to change speed");
   attroff(A_REVERSE);
 
   // Simulationsparameter wie FPS darunter drucken

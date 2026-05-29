@@ -20,7 +20,7 @@ typedef struct {
   bool play;
   int simulationSpeed;
   long frameCount;
-  char message[30];
+  char message[128];
 } GameState;
 
 Universe get_empty_universe();
