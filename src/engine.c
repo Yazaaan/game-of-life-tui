@@ -20,9 +20,8 @@ Universe get_empty_universe() {
 void fill_universe_random(Universe *universe) {
   srand(time(NULL));
 
-  for (int y = 0; y < UNIVERSE_HEIGHT; y++) {
-    for (int x = 0; x < UNIVERSE_WIDTH; x++) {
-      universe->grid[y][x] = ALIVE;
+  for (int y = 0; y < universe->height; y++) {
+    for (int x = 0; x < universe->width; x++) {
       int r = rand() % 3;
       int ergebnis = (r < 2) ? 0 : 1;
       universe->grid[y][x] = ergebnis;
@@ -89,4 +88,8 @@ void time_step(Universe *universe) {
       }
     }
   }
+}
+
+void resize_universe(Universe *old_universe, int new_heigth, int new_width){
+
 }
