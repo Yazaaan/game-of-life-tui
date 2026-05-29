@@ -13,9 +13,7 @@ void ui_init(GameState *settings) {
   nodelay(stdscr, TRUE);
   keypad(stdscr, TRUE);
   curs_set(0);
-  mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-  printf("\033[?1003h"); // Aktiviert das Senden ALLER Mausbewegungen an das
-                         // Terminal
+  mousemask(ALL_MOUSE_EVENTS, NULL);
   // mousemask(BUTTON1_PRESSED | BUTTON4_PRESSED | BUTTON5_PRESSED, NULL);
   mouseinterval(0);
   set_escdelay(25);
@@ -28,20 +26,11 @@ void ui_init(GameState *settings) {
   ui_draw(settings);
 }
 
-void ui_cleanup() {
-  endwin();
-  printf("\033[?1003l");
-}
-
-void adjust_simulation_speed(GameState *game, int adjustment) {
-  int newSpeed = game->simulationSpeed + adjustment;
-  if (newSpeed <= MAX_SPEED && newSpeed >= MIN_SPEED) {
-    game->simulationSpeed = newSpeed;
-  }
-  sprintf(game->message, "Speed: %d", game->simulationSpeed);
-}
+void ui_cleanup() { endwin(); }
 
 void ui_input_process_keyboard(GameState *state, int input) {
+  int newSpeed = 0;
+
   switch (input) {
   case 'q':
     state->running = false;
@@ -51,10 +40,18 @@ void ui_input_process_keyboard(GameState *state, int input) {
     sprintf(state->message, "%s", (state->play) ? "Simulating" : "Stop");
     break;
   case 'j':
-    adjust_simulation_speed(state, SPEED_INCREMENT);
+    newSpeed = state->simulationSpeed + SPEED_INCREMENT;
+    if (newSpeed <= MAX_SPEED) {
+      state->simulationSpeed = newSpeed;
+    }
+    sprintf(state->message, "Speed: %d", state->simulationSpeed);
     break;
   case 'l':
-    adjust_simulation_speed(state, -SPEED_INCREMENT);
+    newSpeed = state->simulationSpeed - SPEED_INCREMENT;
+    if (newSpeed >= MIN_SPEED) {
+      state->simulationSpeed = newSpeed;
+    }
+    sprintf(state->message, "Speed: %d", state->simulationSpeed);
     break;
   case 'r':
     fill_universe_random(&state->universe);
@@ -94,18 +91,18 @@ void ui_process_input(GameState *game) {
   if (input == KEY_MOUSE) {
     MEVENT mouse_event;
     if (getmouse(&mouse_event) == OK) {
-      // Mausrad nach oben
       if (mouse_event.bstate & BUTTON4_PRESSED) {
-        adjust_simulation_speed(game, -SPEED_INCREMENT);
+        // Aktion für Scroll-Up
+        game->simulationSpeed -= SPEED_INCREMENT;
       }
 
       // Mausrad nach unten
       if (mouse_event.bstate & BUTTON5_PRESSED) {
-        adjust_simulation_speed(game, SPEED_INCREMENT);
+        // Aktion für Scroll-Down
+        game->simulationSpeed += SPEED_INCREMENT;
       }
-
-      // Linksklick
-      if (mouse_event.bstate & BUTTON1_PRESSED) {
+      if (mouse_event.bstate & BUTTON1_PRESSED ||
+          mouse_event.bstate & REPORT_MOUSE_POSITION) {
         ui_input_process_mouse(game, &mouse_event);
       }
     }

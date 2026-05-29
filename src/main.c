@@ -13,17 +13,16 @@ int main(void) {
 
   while (game.running) {
     long long currentTime = millis();
-    ui_input_process_keyboard(&game);
+    ui_process_input(&game);
 
     if (game.play) {
       if (currentTime - lastUpdate >= game.simulationSpeed) {
         lastUpdate = millis();
         game.frameCount++;
         time_step(&game.universe);
+        ui_draw(&game);
       }
     }
-
-    ui_draw(&game);
 
     usleep(1000); // Eine Millisekunde warten, damit Schleife nicht konstant
                   // durchrast.
