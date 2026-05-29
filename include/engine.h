@@ -3,13 +3,11 @@
 
 #include <stdbool.h>
 
-#define UNIVERSE_WIDTH 150
-#define UNIVERSE_HEIGHT 40
 #define ALIVE 1
 #define DEAD 0
 
 typedef struct {
-  bool grid[UNIVERSE_HEIGHT][UNIVERSE_WIDTH];
+  bool **grid;
   int width;
   int height;
 } Universe;
@@ -23,10 +21,14 @@ typedef struct {
   char message[128];
 } GameState;
 
-Universe get_empty_universe();
+Universe get_empty_universe(int height, int width);
 
 void fill_universe_random(Universe *universe);
 
 void time_step(Universe *universe);
+
+void resize_universe(Universe* old_universe, int new_heigth, int new_width);
+
+void destroy_universe(Universe *universe);
 
 #endif // !ENGINE

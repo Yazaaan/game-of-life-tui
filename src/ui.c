@@ -20,6 +20,7 @@ void ui_init(GameState *settings) {
   settings->play = false;
   settings->simulationSpeed = 600;
   settings->frameCount = 0;
+  settings->universe = get_empty_universe(LINES - GRID_START_Y, COLS - GRID_START_X);
   sprintf(settings->message, "%s", "");
   ui_draw(settings);
 }
@@ -56,7 +57,7 @@ void ui_input_process_keyboard(GameState *state, int input) {
     sprintf(state->message, "%s", "The Big Bang!");
     break;
   case 'c':
-    state->universe = get_empty_universe();
+    state->universe = get_empty_universe(LINES - GRID_START_Y, COLS - GRID_START_X);
     state->play = false;
     state->frameCount = 0;
     sprintf(state->message, "%s", "Space for something new!");

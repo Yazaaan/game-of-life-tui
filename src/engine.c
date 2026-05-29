@@ -3,16 +3,18 @@
 #include <stdlib.h>
 #include <time.h>
 
-// Leeres Universum erzeugen in dem jede Zelle tot ist
-Universe get_empty_universe() {
-  Universe universe;
-  universe.width = UNIVERSE_WIDTH;
-  universe.height = UNIVERSE_HEIGHT;
+#define min(a, b) ((a) < (b) ? (a) : (b))
 
-  for (int y = 0; y < UNIVERSE_HEIGHT; y++) {
-    for (int x = 0; x < UNIVERSE_WIDTH; x++) {
-      universe.grid[y][x] = DEAD;
-    }
+// Leeres Universum erzeugen in dem jede Zelle tot ist
+Universe get_empty_universe(int height, int width) {
+  Universe universe;
+  universe.width = width;
+  universe.height = height;
+
+  universe.grid = malloc(universe.height * sizeof(bool *));
+  for (int y = 0; y < height; y++) {
+    universe.grid[y] =
+        calloc(width, sizeof(bool)); // calloc setzt alles auf false
   }
   return universe;
 }
@@ -62,34 +64,62 @@ int count_Neighbours(Universe *universe, int y, int x) {
 }
 
 void time_step(Universe *universe) {
-  Universe past_universe = *universe; // Letztes Universum kopieren
+  Universe next_universe = get_empty_universe(universe->height, universe->width);
 
   // Regeln durchsetzen
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {
-      int neighbours = count_Neighbours(&past_universe, y, x);
+      int neighbours = count_Neighbours(universe, y, x);
 
       // Jede lebendigebdende zelle die ...
-      if (past_universe.grid[y][x] == ALIVE) {
-        // ... weniger als 2 Nachbarn stribt
-        if (neighbours < 2) {
-          universe->grid[y][x] = DEAD;
-          // ... mehr als 3 Nachbarn stirbt
-        } else if (neighbours > 3) {
-          universe->grid[y][x] = DEAD;
-        }
-      }
+      if (universe->grid[y][x] == ALIVE) {
+        // ... genau 2 oder 3 Nachbarn hat, überlebt
+        if (neighbours == 2 || neighbours == 3) {
+          next_universe.grid[y][x] = ALIVE;
+        }      }
       // Jede tote Zelle die ...
       else {
         // ... genau 3 Nachbarn hat wird lebendig
         if (neighbours == 3) {
-          universe->grid[y][x] = ALIVE;
+          next_universe.grid[y][x] = ALIVE;
         }
       }
     }
   }
+
+  destroy_universe(universe); // Altes Universum loswerden
+  *universe = next_universe;  // Und durch die neue Iteration ersetzten
 }
 
-void resize_universe(Universe *old_universe, int new_heigth, int new_width){
+void resize_universe(Universe *universe, int new_height, int new_width) {
+  int old_height = universe->height;
+  int old_width = universe->width;
+  bool **old_grid = universe->grid;
 
+  // Neues leeres Universum mit neuer Größe erstellen
+  *universe = get_empty_universe(new_height, new_width);
+
+  // Bestimme die Grenzen für das Kopieren (immer das Kleinere)
+  int copy_height = min(old_height, new_height);
+  int copy_width = min(old_width, new_width);
+
+  // Daten kopieren
+  for (int y = 0; y < copy_height; y++) {
+    for (int x = 0; x < copy_width; x++) {
+      universe->grid[y][x] = old_grid[y][x];
+    }
+  }
+
+  // Speicher freigeben
+  for (int y = 0; y < old_height; y++) {
+    free(old_grid[y]);
+  }
+  free(old_grid);
+}
+
+void destroy_universe(Universe *universe) {
+  for (int i = 0; i < universe->height; i++) {
+    free(universe->grid[i]);
+  }
+  free(universe->grid);
 }

@@ -6,7 +6,6 @@
 
 int main(void) {
   GameState game;
-  game.universe = get_empty_universe();
   long long lastUpdate = 0;
 
   ui_init(&game);
