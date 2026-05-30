@@ -23,7 +23,7 @@ void ui_init(GameState *settings) {
   settings->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
                                           COLS - GRID_START_X - GRID_MARGIN_X);
   sprintf(settings->message, "%s", "");
-  settings->dimensions_variable = true;
+  settings->variable_dimension = true;
   ui_draw(settings);
 }
 
@@ -66,14 +66,16 @@ void ui_input_process_keyboard(GameState *state, int input) {
     sprintf(state->message, "%s", "Space for something new!");
     break;
   case 'h':
-    if (state->dimensions_variable) {
-      state->dimensions_variable = false;
-      sprintf(state->message, "Universe size is now fixed (%d x %d)", state->universe.width, state->universe.height);
+    if (state->variable_dimension) {
+      state->variable_dimension = false;
+      sprintf(state->message, "Universe size is now fixed (%d x %d)",
+              state->universe.width, state->universe.height);
     } else {
-      state->dimensions_variable = true;
+      state->variable_dimension = true;
       resize_universe(&state->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
                       COLS - GRID_START_X - GRID_MARGIN_X);
-      sprintf(state->message, "Universe size is now depending on terminal size");
+      sprintf(state->message,
+              "Universe size is now depending on terminal size");
     }
     break;
   }
@@ -93,8 +95,6 @@ void ui_input_process_mouse(GameState *game, MEVENT *mouse_event) {
   // Linksklick
   if (mouse_event->bstate & BUTTON1_PRESSED) {
     game->play = false;
-    sprintf(game->message, "%s", "Stoppe zum Bearbeiten");
-
     // Mausposition im Gitter speichern
     int click_y = mouse_event->y - GRID_START_Y;
     int click_x = mouse_event->x - GRID_START_X;
@@ -102,14 +102,18 @@ void ui_input_process_mouse(GameState *game, MEVENT *mouse_event) {
     if (click_y < game->universe.height && click_y >= 0 &&
         click_x < game->universe.width && click_x >= 0) {
       bool *cell = &game->universe.grid[click_y][click_x];
-      *cell = !*cell;
+
+      // Zustand wechseln
+      change_cell(&game->universe, click_y, click_x, !*cell);
+
+      game->frameCount = 0;
 
       snprintf(game->message, 128,
-               "Editing mode: changed cell at x:%d, y:%d to %s", click_x,
-               click_y, (*cell) ? "alive" : "dead");
+               "Edit mode: changed cell at x:%d, y:%d to %s", click_x, click_y,
+               (*cell) ? "alive" : "dead");
     } else {
 
-      snprintf(game->message, 128, "Editing mode: out of bounds at x:%d, y:%d",
+      snprintf(game->message, 128, "Edit mode: out of bounds at x:%d, y:%d",
                click_x, click_y);
     }
   }
@@ -126,7 +130,7 @@ void ui_process_input(GameState *game) {
     }
     // Terminal-Resize
   } else if (input == KEY_RESIZE) {
-    if (game->dimensions_variable) {
+    if (game->variable_dimension) {
       resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
                       COLS - GRID_START_X - GRID_MARGIN_X);
     }
@@ -143,20 +147,74 @@ void ui_draw(GameState *game) {
   erase();
 
   attron(A_REVERSE); // Highlight für die Info-Zeile
-  mvprintw(1, COLS / 2 - 10, "Conway's GAME OF LIFE");
-  // mvprintw(0, 0,
-  //          "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate
-  //          " "random | 'k' to play/pause | 'j' to slow down | 'l' to speed up
-  //          | "
-  //          "'h' to lock dimensions | "
-  //          "left mouse button to edit | scroll mouse wheel to change speed");
-  attroff(A_REVERSE);
+  mvprintw(1, COLS / 2 - 10, " Conway's GAME OF LIFE ");
   mvprintw(5, 8, "CONTROLS");
-  mvprintw(6, 8, "========");
-
   mvprintw(5, COLS - 16, "STATS");
-  mvprintw(6, COLS - 16, "=====");
+  attroff(A_REVERSE);
 
+  // Stuerungserklärung am linken Rand
+  char *keys[] = {"q",
+                  "c",
+                  "r",
+                  "k",
+                  "j/mouse wheel down",
+                  "l/mouse wheel up",
+                  "h",
+                  "left mouse button"};
+  char *explaination[] = {
+      "quit",
+      "clear universe",
+      "generate random universe",
+      "play/pause",
+      "slow down simulation",
+      "speed up simulation",
+      "toggle universe scaling",
+      "edit individual cells",
+  };
+  int line = 7;
+  for (int i = 0; i <= 7; i++) {
+    attron(A_BOLD);
+    mvprintw(line++, 1, "%s:", keys[i]);
+    attroff(A_BOLD);
+    mvprintw(line++, 2, "%s", explaination[i]);
+    line++;
+  }
+
+  // Statusinformationen am rechten Rand
+
+  line = 7;
+  int print_x = COLS - GRID_MARGIN_X + 1;
+  attron(A_BOLD);
+  mvprintw(line++, print_x, "%s:", "state");
+  attroff(A_BOLD);
+  mvprintw(line++, print_x + 1, "%s", game->play ? "running" : "stopped");
+  line++;
+  attron(A_BOLD);
+  mvprintw(line++, print_x, "%s:", "frame duration");
+  attroff(A_BOLD);
+  mvprintw(line++, print_x + 1, "%d ms", game->simulationSpeed);
+  line++;
+  attron(A_BOLD);
+  mvprintw(line++, print_x, "%s:", "frame");
+  attroff(A_BOLD);
+  mvprintw(line++, print_x + 1, "%ld", game->frameCount);
+  line++;
+  attron(A_BOLD);
+  mvprintw(line++, print_x, "%s:", "cell count");
+  attroff(A_BOLD);
+  mvprintw(line++, print_x + 1, "%d", game->universe.cells_alive);
+  line++;
+  attron(A_BOLD);
+  mvprintw(line++, print_x, "%s:", "scaling mode");
+  attroff(A_BOLD);
+  mvprintw(line++, print_x + 1, "%s", game->variable_dimension ? "dynamic" : "fixed");
+  line++;
+  attron(A_BOLD);
+  mvprintw(line++, print_x, "%s:", "dimensions");
+  attroff(A_BOLD);
+  mvprintw(line++, print_x + 1, "%d x %d", game->universe.width, game->universe.height);
+
+  // Informationszeile am unteren Rand
   mvprintw(LINES - 1, GRID_START_X, "> %s", game->message);
 
   // Spielfeld zeichnen

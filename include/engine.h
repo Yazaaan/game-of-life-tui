@@ -10,6 +10,7 @@ typedef struct {
   bool **grid;
   int width;
   int height;
+  int cells_alive;
 } Universe;
 
 typedef struct {
@@ -19,12 +20,14 @@ typedef struct {
   int simulationSpeed;
   long frameCount;
   char message[128];
-  bool dimensions_variable;
+  bool variable_dimension;
 } GameState;
 
 Universe get_empty_universe(int height, int width);
 
 void fill_universe_random(Universe *universe);
+
+void change_cell(Universe *universe, int y, int x, bool state);
 
 void time_step(Universe *universe);
 

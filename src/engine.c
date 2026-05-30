@@ -10,6 +10,7 @@ Universe get_empty_universe(int height, int width) {
   Universe universe;
   universe.width = width;
   universe.height = height;
+  universe.cells_alive = 0;
 
   universe.grid = malloc(universe.height * sizeof(bool *));
   for (int y = 0; y < height; y++) {
@@ -25,8 +26,8 @@ void fill_universe_random(Universe *universe) {
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {
       int r = rand() % 3;
-      int ergebnis = (r < 2) ? 0 : 1;
-      universe->grid[y][x] = ergebnis;
+      int result = (r < 2) ? 0 : 1;
+      change_cell(universe, y, x, result);
     }
   }
 }
@@ -63,8 +64,23 @@ int count_Neighbours(Universe *universe, int y, int x) {
   return count;
 }
 
+void change_cell(Universe *universe, int y, int x, bool new_state) {
+  bool old_state = universe->grid[y][x];
+  universe->grid[y][x] = new_state;
+
+  // Nur wenn der neue Zustand vom alten Zustand unterschiedlich ist, soll gezählt werden
+  if (old_state != new_state) {
+    if (new_state) {
+      universe->cells_alive++;
+    } else {
+      universe->cells_alive--;
+    }
+  }
+}
+
 void time_step(Universe *universe) {
-  Universe next_universe = get_empty_universe(universe->height, universe->width);
+  Universe next_universe =
+      get_empty_universe(universe->height, universe->width);
 
   // Regeln durchsetzen
   for (int y = 0; y < universe->height; y++) {
@@ -75,13 +91,16 @@ void time_step(Universe *universe) {
       if (universe->grid[y][x] == ALIVE) {
         // ... genau 2 oder 3 Nachbarn hat, überlebt
         if (neighbours == 2 || neighbours == 3) {
-          next_universe.grid[y][x] = ALIVE;
-        }      }
+          change_cell(&next_universe, y, x, ALIVE);
+          // next_universe.grid[y][x] = ALIVE;
+        }
+      }
       // Jede tote Zelle die ...
       else {
         // ... genau 3 Nachbarn hat wird lebendig
         if (neighbours == 3) {
-          next_universe.grid[y][x] = ALIVE;
+          change_cell(&next_universe, y, x, ALIVE);
+          // next_universe.grid[y][x] = ALIVE;
         }
       }
     }
