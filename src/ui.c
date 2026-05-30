@@ -56,7 +56,7 @@ void ui_input_process_keyboard(GameState *state, int input) {
     fill_universe_random(&state->universe);
     state->play = false;
     state->frameCount = 0;
-    sprintf(state->message, "%s", "The Big Bang!");
+    sprintf(state->message, "The Big Bang!");
     break;
   case 'c':
     state->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
@@ -68,10 +68,12 @@ void ui_input_process_keyboard(GameState *state, int input) {
   case 'h':
     if (state->dimensions_variable) {
       state->dimensions_variable = false;
+      sprintf(state->message, "Universe size is now fixed (%d x %d)", state->universe.width, state->universe.height);
     } else {
       state->dimensions_variable = true;
       resize_universe(&state->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
                       COLS - GRID_START_X - GRID_MARGIN_X);
+      sprintf(state->message, "Universe size is now depending on terminal size");
     }
     break;
   }
@@ -123,9 +125,11 @@ void ui_process_input(GameState *game) {
       ui_input_process_mouse(game, &mouse_event);
     }
     // Terminal-Resize
-  } else if (game->dimensions_variable && input == KEY_RESIZE) {
-    resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
-                    COLS - GRID_START_X - GRID_MARGIN_X);
+  } else if (input == KEY_RESIZE) {
+    if (game->dimensions_variable) {
+      resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
+                      COLS - GRID_START_X - GRID_MARGIN_X);
+    }
     // Tastatureingabe verarbeiten
   } else if (input != ERR) {
     ui_input_process_keyboard(game, input);
@@ -139,21 +143,30 @@ void ui_draw(GameState *game) {
   erase();
 
   attron(A_REVERSE); // Highlight für die Info-Zeile
-  mvprintw(0, 0,
-           "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate "
-           "random | 'k' to play/pause | 'j' to slow down | 'l' to speed up | "
-           "'h' to lock dimensions | "
-           "left mouse button to edit | scroll mouse wheel to change speed");
+  mvprintw(1, COLS / 2 - 10, "Conway's GAME OF LIFE");
+  // mvprintw(0, 0,
+  //          "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate
+  //          " "random | 'k' to play/pause | 'j' to slow down | 'l' to speed up
+  //          | "
+  //          "'h' to lock dimensions | "
+  //          "left mouse button to edit | scroll mouse wheel to change speed");
   attroff(A_REVERSE);
+  mvprintw(5, 8, "CONTROLS");
+  mvprintw(6, 8, "========");
 
-  // Simulationsparameter wie FPS darunter drucken
+  mvprintw(5, COLS - 16, "STATS");
+  mvprintw(6, COLS - 16, "=====");
 
-  mvprintw(3, 0, "> %s", game->message);
+  mvprintw(LINES - 1, GRID_START_X, "> %s", game->message);
+
   // Spielfeld zeichnen
   for (int y = 0; y < game->universe.height; y++) {
     for (int x = 0; x < game->universe.width; x++) {
-      mvaddch(y + GRID_START_Y, x + GRID_START_X,
-              (game->universe.grid[y][x] == ALIVE) ? '#' : ' ');
+      if (y + GRID_START_Y < LINES - GRID_MARGIN_Y &&
+          x + GRID_START_X < COLS - GRID_MARGIN_X) {
+        mvaddch(y + GRID_START_Y, x + GRID_START_X,
+                (game->universe.grid[y][x] == ALIVE) ? '#' : ' ');
+      }
     }
   }
 
