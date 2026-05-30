@@ -20,8 +20,8 @@ void ui_init(GameState *settings) {
   settings->play = false;
   settings->simulationSpeed = 600;
   settings->frameCount = 0;
-  settings->universe =
-      get_empty_universe(LINES - GRID_START_Y, COLS - GRID_START_X);
+  settings->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
+                                          COLS - GRID_START_X - GRID_MARGIN_X);
   sprintf(settings->message, "%s", "");
   settings->dimensions_variable = true;
   ui_draw(settings);
@@ -59,8 +59,8 @@ void ui_input_process_keyboard(GameState *state, int input) {
     sprintf(state->message, "%s", "The Big Bang!");
     break;
   case 'c':
-    state->universe =
-        get_empty_universe(LINES - GRID_START_Y, COLS - GRID_START_X);
+    state->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
+                                         COLS - GRID_START_X - GRID_MARGIN_X);
     state->play = false;
     state->frameCount = 0;
     sprintf(state->message, "%s", "Space for something new!");
@@ -70,7 +70,8 @@ void ui_input_process_keyboard(GameState *state, int input) {
       state->dimensions_variable = false;
     } else {
       state->dimensions_variable = true;
-      resize_universe(&state->universe, LINES, COLS);
+      resize_universe(&state->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
+                      COLS - GRID_START_X - GRID_MARGIN_X);
     }
     break;
   }
@@ -123,7 +124,8 @@ void ui_process_input(GameState *game) {
     }
     // Terminal-Resize
   } else if (game->dimensions_variable && input == KEY_RESIZE) {
-    resize_universe(&game->universe, LINES, COLS);
+    resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
+                    COLS - GRID_START_X - GRID_MARGIN_X);
     // Tastatureingabe verarbeiten
   } else if (input != ERR) {
     ui_input_process_keyboard(game, input);
