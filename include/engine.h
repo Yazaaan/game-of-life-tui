@@ -19,6 +19,7 @@ typedef struct {
   int simulationSpeed;
   long frameCount;
   char message[128];
+  bool dimensions_variable;
 } GameState;
 
 Universe get_empty_universe(int height, int width);

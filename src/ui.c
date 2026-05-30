@@ -23,6 +23,7 @@ void ui_init(GameState *settings) {
   settings->universe =
       get_empty_universe(LINES - GRID_START_Y, COLS - GRID_START_X);
   sprintf(settings->message, "%s", "");
+  settings->dimensions_variable = true;
   ui_draw(settings);
 }
 
@@ -33,7 +34,7 @@ void adjust_simulation_speed(GameState *game, int adjustment) {
   if (newSpeed <= MAX_SPEED && newSpeed >= MIN_SPEED) {
     game->simulationSpeed = newSpeed;
   }
-  sprintf(game->message, "Speed: %d", game->simulationSpeed);
+  sprintf(game->message, "Frame time: %d ms", game->simulationSpeed);
 }
 
 void ui_input_process_keyboard(GameState *state, int input) {
@@ -63,6 +64,14 @@ void ui_input_process_keyboard(GameState *state, int input) {
     state->play = false;
     state->frameCount = 0;
     sprintf(state->message, "%s", "Space for something new!");
+    break;
+  case 'h':
+    if (state->dimensions_variable) {
+      state->dimensions_variable = false;
+    } else {
+      state->dimensions_variable = true;
+      resize_universe(&state->universe, LINES, COLS);
+    }
     break;
   }
 }
@@ -113,7 +122,7 @@ void ui_process_input(GameState *game) {
       ui_input_process_mouse(game, &mouse_event);
     }
     // Terminal-Resize
-  } else if (input == KEY_RESIZE) {
+  } else if (game->dimensions_variable && input == KEY_RESIZE) {
     resize_universe(&game->universe, LINES, COLS);
     // Tastatureingabe verarbeiten
   } else if (input != ERR) {
@@ -131,6 +140,7 @@ void ui_draw(GameState *game) {
   mvprintw(0, 0,
            "Game Of Life | Press 'q' to quit | 'c' to clear | 'r' to generate "
            "random | 'k' to play/pause | 'j' to slow down | 'l' to speed up | "
+           "'h' to lock dimensions | "
            "left mouse button to edit | scroll mouse wheel to change speed");
   attroff(A_REVERSE);
 
