@@ -34,7 +34,7 @@ void adjust_simulation_speed(GameState *game, int adjustment) {
   if (newSpeed <= MAX_SPEED && newSpeed >= MIN_SPEED) {
     game->simulationSpeed = newSpeed;
   }
-  sprintf(game->message, "Frame time: %d ms", game->simulationSpeed);
+  sprintf(game->message, "Changed frame time to %d ms.", game->simulationSpeed);
 }
 
 void ui_input_process_keyboard(GameState *state, int input) {
@@ -142,17 +142,11 @@ void ui_process_input(GameState *game) {
   ui_draw(game);
 }
 
-void ui_draw(GameState *game) {
-  // clear();
-  erase();
-
-  attron(A_REVERSE); // Highlight für die Info-Zeile
-  mvprintw(1, COLS / 2 - 10, " Conway's GAME OF LIFE ");
-  mvprintw(5, 8, "CONTROLS");
-  mvprintw(5, COLS - 16, "STATS");
+void ui_print_tooltips(void) {
+  attron(A_REVERSE);
+  mvprintw(4, 9, "CONTROLS");
   attroff(A_REVERSE);
 
-  // Stuerungserklärung am linken Rand
   char *keys[] = {"q",
                   "c",
                   "r",
@@ -171,7 +165,7 @@ void ui_draw(GameState *game) {
       "toggle universe scaling",
       "edit individual cells",
   };
-  int line = 7;
+  int line = 6;
   for (int i = 0; i <= 7; i++) {
     attron(A_BOLD);
     mvprintw(line++, 1, "%s:", keys[i]);
@@ -179,11 +173,15 @@ void ui_draw(GameState *game) {
     mvprintw(line++, 2, "%s", explaination[i]);
     line++;
   }
+}
 
-  // Statusinformationen am rechten Rand
+void ui_print_stats(GameState *game) {
+  attron(A_REVERSE);
+  mvprintw(4, COLS - 12, "STATS");
+  attroff(A_REVERSE);
 
-  line = 7;
-  int print_x = COLS - GRID_MARGIN_X + 1;
+  int line = 6;
+  int print_x = COLS - GRID_MARGIN_X + 2;
   attron(A_BOLD);
   mvprintw(line++, print_x, "%s:", "state");
   attroff(A_BOLD);
@@ -207,12 +205,53 @@ void ui_draw(GameState *game) {
   attron(A_BOLD);
   mvprintw(line++, print_x, "%s:", "scaling mode");
   attroff(A_BOLD);
-  mvprintw(line++, print_x + 1, "%s", game->variable_dimension ? "dynamic" : "fixed");
+  mvprintw(line++, print_x + 1, "%s",
+           game->variable_dimension ? "dynamic" : "fixed");
   line++;
   attron(A_BOLD);
   mvprintw(line++, print_x, "%s:", "dimensions");
   attroff(A_BOLD);
-  mvprintw(line++, print_x + 1, "%d x %d", game->universe.width, game->universe.height);
+  mvprintw(line++, print_x + 1, "%d x %d", game->universe.width,
+           game->universe.height);
+}
+
+void ui_print_dividers(void) {
+  // Horizontale Line unter Überschrift
+  for (int i = 0; i <= COLS; i++) {
+    mvprintw(3, i, "-");
+  }
+  // Horizontale Line unter Universum
+  int line_hight = LINES - GRID_MARGIN_Y;
+  for (int i = 0; i <= COLS; i++) {
+    mvprintw(line_hight, i, "-");
+  }
+  // Verticale Linie links
+  int line_pos_x = GRID_START_X - 1;
+  for (int i = 4; i < line_hight; i++) {
+    mvprintw(i, line_pos_x, "|");
+  }
+  line_pos_x = COLS - GRID_MARGIN_X;
+  for (int i = 4; i < line_hight; i++) {
+    mvprintw(i, line_pos_x, "|");
+  }
+}
+
+void ui_draw(GameState *game) {
+  // clear();
+  erase();
+
+  attron(A_REVERSE); // Highlight für die Info-Zeile
+  mvprintw(1, COLS / 2 - 10, " Conway's GAME OF LIFE ");
+  attroff(A_REVERSE);
+
+  // Steuerungserklärung am linken Rand
+  ui_print_tooltips();
+
+  // Statusinformationen am rechten Rand
+  ui_print_stats(game);
+
+  // Trennlinien zwischen UI-Elementen
+  ui_print_dividers();
 
   // Informationszeile am unteren Rand
   mvprintw(LINES - 1, GRID_START_X, "> %s", game->message);

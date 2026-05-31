@@ -1,7 +1,7 @@
 #include "../include/engine.h"
-#define GRID_START_X 27
-#define GRID_START_Y 5
-#define GRID_MARGIN_X 26
+#define GRID_START_X 28
+#define GRID_START_Y 4
+#define GRID_MARGIN_X 18
 #define GRID_MARGIN_Y 2
 #define TERMINAL_MIN_WIDTH 70
 #define TERMINAL_MIN_HEIGHT 70

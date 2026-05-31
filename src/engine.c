@@ -125,7 +125,7 @@ void resize_universe(Universe *universe, int new_height, int new_width) {
   // Daten kopieren
   for (int y = 0; y < copy_height; y++) {
     for (int x = 0; x < copy_width; x++) {
-      universe->grid[y][x] = old_grid[y][x];
+      change_cell(universe, y, x, old_grid[y][x]);
     }
   }
 
