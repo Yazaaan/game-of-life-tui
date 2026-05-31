@@ -13,6 +13,12 @@ void ui_init(GameState *settings) {
   nodelay(stdscr, TRUE);
   keypad(stdscr, TRUE);
   curs_set(0);
+  start_color();
+  use_default_colors();
+  init_pair(1, 12, -1); // Akzentfarbe (12) setzen (Für Hervorhebungen),
+                        // Hintergrund (-1) transparent
+  init_pair(2, 8, -1); 
+  init_pair(3, 9, -1);
   mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
   mouseinterval(0);
 
@@ -47,7 +53,8 @@ void ui_input_process_keyboard(GameState *state, int input) {
     sprintf(state->message, "%s", (state->play) ? "Simulating" : "Stop");
     break;
   case 'j':
-    if(state->play) adjust_simulation_speed(state, SPEED_INCREMENT);
+    if (state->play)
+      adjust_simulation_speed(state, SPEED_INCREMENT);
     break;
   case 'l':
     if (!state->play) {
@@ -99,7 +106,8 @@ void ui_input_process_mouse(GameState *game, MEVENT *mouse_event) {
 
   // Mausrad nach unten
   if (mouse_event->bstate & BUTTON5_PRESSED) {
-    if(game->play) adjust_simulation_speed(game, SPEED_INCREMENT);
+    if (game->play)
+      adjust_simulation_speed(game, SPEED_INCREMENT);
   }
 
   // Linksklick
@@ -177,9 +185,9 @@ void ui_print_tooltips(void) {
   };
   int line = 6;
   for (int i = 0; i <= 7; i++) {
-    attron(A_BOLD);
+    attron(A_BOLD | COLOR_PAIR(1));
     mvprintw(line++, 1, "%s:", keys[i]);
-    attroff(A_BOLD);
+    attroff(A_BOLD | COLOR_PAIR(1));
     mvprintw(line++, 2, "%s", explaination[i]);
     line++;
   }
@@ -192,40 +200,41 @@ void ui_print_stats(GameState *game) {
 
   int line = 6;
   int print_x = COLS - GRID_MARGIN_X + 2;
-  attron(A_BOLD);
+  attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "state");
-  attroff(A_BOLD);
+  attroff(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x + 1, "%s", game->play ? "running" : "stopped");
   line++;
-  attron(A_BOLD);
+  attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "frame duration");
-  attroff(A_BOLD);
+  attroff(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x + 1, "%d ms", game->simulationSpeed);
   line++;
-  attron(A_BOLD);
+  attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "frame");
-  attroff(A_BOLD);
+  attroff(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x + 1, "%ld", game->frameCount);
   line++;
-  attron(A_BOLD);
+  attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "cell count");
-  attroff(A_BOLD);
+  attroff(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x + 1, "%d", game->universe.cells_alive);
   line++;
-  attron(A_BOLD);
+  attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "scaling mode");
-  attroff(A_BOLD);
+  attroff(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x + 1, "%s",
            game->variable_dimension ? "dynamic" : "fixed");
   line++;
-  attron(A_BOLD);
+  attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "dimensions");
-  attroff(A_BOLD);
+  attroff(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x + 1, "%d x %d", game->universe.width,
            game->universe.height);
 }
 
 void ui_print_dividers(void) {
+  attron(COLOR_PAIR(2));
   // Horizontale Line unter Überschrift
   for (int i = 0; i <= COLS; i++) {
     mvprintw(3, i, "-");
@@ -244,9 +253,12 @@ void ui_print_dividers(void) {
   for (int i = 4; i < line_hight; i++) {
     mvprintw(i, line_pos_x, "|");
   }
+  attroff(COLOR_PAIR(2));
 }
 
 void ui_draw_universe_border(int height, int width) {
+  attron(COLOR_PAIR(3));
+
   // Rechte Wand
   if (COLS > GRID_START_X + width + GRID_MARGIN_X) {
     for (int y = GRID_START_Y;
@@ -261,6 +273,7 @@ void ui_draw_universe_border(int height, int width) {
       mvaddch(GRID_START_Y + height, x, '.');
     }
   }
+  attroff(COLOR_PAIR(3));
 }
 
 void ui_draw(GameState *game) {
@@ -289,7 +302,7 @@ void ui_draw(GameState *game) {
       if (y + GRID_START_Y < LINES - GRID_MARGIN_Y &&
           x + GRID_START_X < COLS - GRID_MARGIN_X) {
         mvaddch(y + GRID_START_Y, x + GRID_START_X,
-                (game->universe.grid[y][x] == ALIVE) ? '#' : ' ');
+                (game->universe.grid[y][x] == ALIVE) ? ACS_BLOCK : ' ');
       }
     }
   }

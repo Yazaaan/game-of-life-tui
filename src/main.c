@@ -28,5 +28,6 @@ int main(void) {
   }
 
   ui_cleanup();
+  destroy_universe(&game.universe);
   return 0;
 }
