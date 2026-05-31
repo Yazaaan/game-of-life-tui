@@ -17,7 +17,6 @@ int main(void) {
     if (game.play) {
       if (currentTime - lastUpdate >= game.simulationSpeed) {
         lastUpdate = millis();
-        game.frameCount++;
         time_step(&game.universe);
         ui_draw(&game);
       }

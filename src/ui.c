@@ -17,7 +17,7 @@ void ui_init(GameState *settings) {
   use_default_colors();
   init_pair(1, 12, -1); // Akzentfarbe (12) setzen (Für Hervorhebungen),
                         // Hintergrund (-1) transparent
-  init_pair(2, 8, -1); 
+  init_pair(2, 8, -1);
   init_pair(3, 9, -1);
   mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
   mouseinterval(0);
@@ -25,7 +25,6 @@ void ui_init(GameState *settings) {
   settings->running = true;
   settings->play = false;
   settings->simulationSpeed = 600;
-  settings->frameCount = 0;
   settings->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
                                           COLS - GRID_START_X - GRID_MARGIN_X);
   sprintf(settings->message, "%s", "");
@@ -67,14 +66,17 @@ void ui_input_process_keyboard(GameState *state, int input) {
   case 'r':
     fill_universe_random(&state->universe);
     state->play = false;
-    state->frameCount = 0;
     sprintf(state->message, "The Big Bang!");
     break;
   case 'c':
-    state->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
-                                         COLS - GRID_START_X - GRID_MARGIN_X);
+    if (state->variable_dimension) {
+      state->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
+                                           COLS - GRID_START_X - GRID_MARGIN_X);
+    } else {
+      state->universe =
+          get_empty_universe(state->universe.height, state->universe.width);
+    }
     state->play = false;
-    state->frameCount = 0;
     sprintf(state->message, "%s", "Space for something new!");
     break;
   case 'h':
@@ -124,7 +126,7 @@ void ui_input_process_mouse(GameState *game, MEVENT *mouse_event) {
       // Zustand wechseln
       change_cell(&game->universe, click_y, click_x, !*cell);
 
-      game->frameCount = 0;
+      game->universe.frameCount = 0;
 
       snprintf(game->message, 128,
                "Edit mode: changed cell at x:%d, y:%d to %s", click_x, click_y,
@@ -213,7 +215,7 @@ void ui_print_stats(GameState *game) {
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "frame");
   attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%ld", game->frameCount);
+  mvprintw(line++, print_x + 1, "%ld", game->universe.frameCount);
   line++;
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "cell count");

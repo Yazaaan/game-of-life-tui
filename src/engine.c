@@ -11,6 +11,7 @@ Universe get_empty_universe(int height, int width) {
   universe.width = width;
   universe.height = height;
   universe.cells_alive = 0;
+  universe.frameCount = 0;
 
   universe.grid = malloc(universe.height * sizeof(bool *));
   for (int y = 0; y < height; y++) {
@@ -22,6 +23,8 @@ Universe get_empty_universe(int height, int width) {
 
 void fill_universe_random(Universe *universe) {
   srand(time(NULL));
+
+  universe->frameCount = 0;
 
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {
@@ -68,7 +71,8 @@ void change_cell(Universe *universe, int y, int x, bool new_state) {
   bool old_state = universe->grid[y][x];
   universe->grid[y][x] = new_state;
 
-  // Nur wenn der neue Zustand vom alten Zustand unterschiedlich ist, soll gezählt werden
+  // Nur wenn der neue Zustand vom alten Zustand unterschiedlich ist, soll
+  // gezählt werden
   if (old_state != new_state) {
     if (new_state) {
       universe->cells_alive++;
@@ -81,6 +85,8 @@ void change_cell(Universe *universe, int y, int x, bool new_state) {
 void time_step(Universe *universe) {
   Universe next_universe =
       get_empty_universe(universe->height, universe->width);
+
+  next_universe.frameCount = universe->frameCount + 1;
 
   // Regeln durchsetzen
   for (int y = 0; y < universe->height; y++) {

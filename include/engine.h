@@ -11,6 +11,7 @@ typedef struct {
   int width;
   int height;
   int cells_alive;
+  long frameCount;
 } Universe;
 
 typedef struct {
@@ -18,7 +19,6 @@ typedef struct {
   bool running;
   bool play;
   int simulationSpeed;
-  long frameCount;
   char message[128];
   bool variable_dimension;
 } GameState;
@@ -31,7 +31,7 @@ void change_cell(Universe *universe, int y, int x, bool state);
 
 void time_step(Universe *universe);
 
-void resize_universe(Universe* old_universe, int new_heigth, int new_width);
+void resize_universe(Universe *old_universe, int new_heigth, int new_width);
 
 void destroy_universe(Universe *universe);
 
