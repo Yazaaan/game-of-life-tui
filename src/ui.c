@@ -236,6 +236,23 @@ void ui_print_dividers(void) {
   }
 }
 
+void ui_draw_universe_border(int height, int width) {
+  // Rechte Wand
+  if (COLS > GRID_START_X + width + GRID_MARGIN_X) {
+    for (int y = GRID_START_Y;
+         y < GRID_START_Y + height && y < LINES - GRID_MARGIN_Y; y++) {
+      mvaddch(y, GRID_START_X + width, '.');
+    }
+  }
+  // Untere Wand
+  if (LINES > GRID_START_Y + height + GRID_MARGIN_Y) {
+    for (int x = GRID_START_X;
+         x <= GRID_START_X + width && x < COLS - GRID_MARGIN_X; x++) {
+      mvaddch(GRID_START_Y + height, x, '.');
+    }
+  }
+}
+
 void ui_draw(GameState *game) {
   // clear();
   erase();
@@ -265,6 +282,11 @@ void ui_draw(GameState *game) {
                 (game->universe.grid[y][x] == ALIVE) ? '#' : ' ');
       }
     }
+  }
+
+  // Bei fixer Universumgröße eine Begrenzung zeichnen
+  if (!game->variable_dimension) {
+    ui_draw_universe_border(game->universe.height, game->universe.width);
   }
 
   refresh();
