@@ -47,10 +47,15 @@ void ui_input_process_keyboard(GameState *state, int input) {
     sprintf(state->message, "%s", (state->play) ? "Simulating" : "Stop");
     break;
   case 'j':
-    adjust_simulation_speed(state, SPEED_INCREMENT);
+    if(state->play) adjust_simulation_speed(state, SPEED_INCREMENT);
     break;
   case 'l':
-    adjust_simulation_speed(state, -SPEED_INCREMENT);
+    if (!state->play) {
+      sprintf(state->message, "Stepping a single frame");
+      time_step(&state->universe);
+    } else {
+      adjust_simulation_speed(state, -SPEED_INCREMENT);
+    }
     break;
   case 'r':
     fill_universe_random(&state->universe);
@@ -84,12 +89,17 @@ void ui_input_process_keyboard(GameState *state, int input) {
 void ui_input_process_mouse(GameState *game, MEVENT *mouse_event) {
   // Mausrad nach oben
   if (mouse_event->bstate & BUTTON4_PRESSED) {
-    adjust_simulation_speed(game, -SPEED_INCREMENT);
+    if (!game->play) {
+      sprintf(game->message, "Stepping a single frame");
+      time_step(&game->universe);
+    } else {
+      adjust_simulation_speed(game, -SPEED_INCREMENT);
+    }
   }
 
   // Mausrad nach unten
   if (mouse_event->bstate & BUTTON5_PRESSED) {
-    adjust_simulation_speed(game, SPEED_INCREMENT);
+    if(game->play) adjust_simulation_speed(game, SPEED_INCREMENT);
   }
 
   // Linksklick
@@ -161,7 +171,7 @@ void ui_print_tooltips(void) {
       "generate random universe",
       "play/pause",
       "slow down simulation",
-      "speed up simulation",
+      "speed up simulation/\n  next frame when paused",
       "toggle universe scaling",
       "edit individual cells",
   };
