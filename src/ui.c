@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void ui_init(Game_State *settings) {
+void ui_init(Game_State *game) {
   initscr();
   noecho();
   cbreak();
@@ -22,14 +22,14 @@ void ui_init(Game_State *settings) {
   mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
   mouseinterval(0);
 
-  settings->running = true;
-  settings->play = false;
-  settings->simulation_speed = 600;
-  settings->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
+  game->running = true;
+  game->play = false;
+  game->simulation_speed = 600;
+  game->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
                                           COLS - GRID_START_X - GRID_MARGIN_X);
-  sprintf(settings->message, "%s", "");
-  settings->variable_dimension = true;
-  ui_draw(settings);
+  sprintf(game->message, "%s", "");
+  game->variable_dimension = true;
+  ui_draw(game);
 }
 
 void ui_cleanup() { endwin(); }
@@ -42,52 +42,52 @@ void adjust_simulation_speed(Game_State *game, int adjustment) {
   sprintf(game->message, "Changed frame time to %d ms.", game->simulation_speed);
 }
 
-void ui_input_process_keyboard(Game_State *state, int input) {
+void ui_input_process_keyboard(Game_State *game, int input) {
   switch (input) {
   case 'q':
-    state->running = false;
+    game->running = false;
     break;
   case 'k':
-    state->play = !state->play;
-    sprintf(state->message, "%s", (state->play) ? "Simulating" : "Stop");
+    game->play = !game->play;
+    sprintf(game->message, "%s", (game->play) ? "Simulating" : "Stop");
     break;
   case 'j':
-    adjust_simulation_speed(state, SPEED_INCREMENT);
+    adjust_simulation_speed(game, SPEED_INCREMENT);
     break;
   case 'l':
-    adjust_simulation_speed(state, -SPEED_INCREMENT);
+    adjust_simulation_speed(game, -SPEED_INCREMENT);
     break;
   case 'm':
-    if (!state->play)
-      time_step(&state->universe);
-    sprintf(state->message, "Stepping a single frame");
+    if (!game->play)
+      time_step(&game->universe);
+    sprintf(game->message, "Stepping a single frame");
     break;
   case 'r':
-    fill_universe_random(&state->universe);
-    state->play = false;
-    sprintf(state->message, "The Big Bang!");
+    fill_universe_random(&game->universe);
+    game->play = false;
+    sprintf(game->message, "The Big Bang!");
     break;
   case 'c':
-    if (state->variable_dimension) {
-      state->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
+    if (game->variable_dimension) {
+      game->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
                                            COLS - GRID_START_X - GRID_MARGIN_X);
     } else {
-      state->universe =
-          get_empty_universe(state->universe.height, state->universe.width);
+      game->universe =
+          get_empty_universe(game->universe.height, game->universe.width);
     }
-    state->play = false;
-    sprintf(state->message, "%s", "Space for something new!");
+    game->play = false;
+    sprintf(game->message, "%s", "Space for something new!");
     break;
   case 'h':
-    if (state->variable_dimension) {
-      state->variable_dimension = false;
-      sprintf(state->message, "Universe size is now fixed (%d x %d)",
-              state->universe.width, state->universe.height);
+    if (game->variable_dimension) {
+      game->variable_dimension = false;
+      sprintf(game->message, "Universe size is now fixed (%d x %d)",
+              game->universe.width, game->universe.height);
     } else {
-      state->variable_dimension = true;
-      resize_universe(&state->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
+      game->variable_dimension = true;
+      resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
                       COLS - GRID_START_X - GRID_MARGIN_X);
-      sprintf(state->message,
+      sprintf(game->message,
               "Universe size is now depending on terminal size");
     }
     break;
@@ -169,7 +169,7 @@ void ui_print_tooltips(void) {
                   "m",
                   "h",
                   "left mouse button"};
-  char *explaination[] = {
+  char *explanation[] = {
       "quit",
       "clear universe",
       "generate random universe",
@@ -185,7 +185,7 @@ void ui_print_tooltips(void) {
     attron(A_BOLD | COLOR_PAIR(1));
     mvprintw(line++, 1, "%s:", keys[i]);
     attroff(A_BOLD | COLOR_PAIR(1));
-    mvprintw(line++, 2, "%s", explaination[i]);
+    mvprintw(line++, 2, "%s", explanation[i]);
     line++;
   }
 }
@@ -198,7 +198,7 @@ void ui_print_stats(Game_State *game) {
   int line = 6;
   int print_x = COLS - GRID_MARGIN_X + 2;
   attron(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x, "%s:", "state");
+  mvprintw(line++, print_x, "%s:", "game");
   attroff(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x + 1, "%s", game->play ? "running" : "stopped");
   line++;
