@@ -5,18 +5,18 @@
 #include <unistd.h>
 
 int main(void) {
-  GameState game;
-  long long lastUpdate = 0;
+  Game_State game;
+  long long last_update = 0;
 
   ui_init(&game);
 
   while (game.running) {
-    long long currentTime = millis();
+    long long current_time = millis();
     ui_process_input(&game);
 
     if (game.play) {
-      if (currentTime - lastUpdate >= game.simulationSpeed) {
-        lastUpdate = millis();
+      if (current_time - last_update >= game.simulation_speed) {
+        last_update = millis();
         time_step(&game.universe);
         ui_draw(&game);
       }

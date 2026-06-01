@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-void ui_init(GameState *settings) {
+void ui_init(Game_State *settings) {
   initscr();
   noecho();
   cbreak();
@@ -24,7 +24,7 @@ void ui_init(GameState *settings) {
 
   settings->running = true;
   settings->play = false;
-  settings->simulationSpeed = 600;
+  settings->simulation_speed = 600;
   settings->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
                                           COLS - GRID_START_X - GRID_MARGIN_X);
   sprintf(settings->message, "%s", "");
@@ -34,15 +34,15 @@ void ui_init(GameState *settings) {
 
 void ui_cleanup() { endwin(); }
 
-void adjust_simulation_speed(GameState *game, int adjustment) {
-  int newSpeed = game->simulationSpeed + adjustment;
+void adjust_simulation_speed(Game_State *game, int adjustment) {
+  int newSpeed = game->simulation_speed + adjustment;
   if (newSpeed <= MAX_SPEED && newSpeed >= MIN_SPEED) {
-    game->simulationSpeed = newSpeed;
+    game->simulation_speed = newSpeed;
   }
-  sprintf(game->message, "Changed frame time to %d ms.", game->simulationSpeed);
+  sprintf(game->message, "Changed frame time to %d ms.", game->simulation_speed);
 }
 
-void ui_input_process_keyboard(GameState *state, int input) {
+void ui_input_process_keyboard(Game_State *state, int input) {
   switch (input) {
   case 'q':
     state->running = false;
@@ -94,7 +94,7 @@ void ui_input_process_keyboard(GameState *state, int input) {
   }
 }
 
-void ui_input_process_mouse(GameState *game, MEVENT *mouse_event) {
+void ui_input_process_mouse(Game_State *game, MEVENT *mouse_event) {
   // Mausrad nach oben
   if (mouse_event->bstate & BUTTON4_PRESSED) {
     adjust_simulation_speed(game, -SPEED_INCREMENT);
@@ -119,7 +119,7 @@ void ui_input_process_mouse(GameState *game, MEVENT *mouse_event) {
       // Zustand wechseln
       change_cell(&game->universe, click_y, click_x, !*cell);
 
-      game->universe.frameCount = 0;
+      game->universe.frame_count = 0;
 
       snprintf(game->message, 128,
                "Edit mode: changed cell at x:%d, y:%d to %s", click_x, click_y,
@@ -132,7 +132,7 @@ void ui_input_process_mouse(GameState *game, MEVENT *mouse_event) {
   }
 }
 
-void ui_process_input(GameState *game) {
+void ui_process_input(Game_State *game) {
   int input = getch(); // Hole den Input
 
   // Mauseingabe verarbeiten
@@ -190,7 +190,7 @@ void ui_print_tooltips(void) {
   }
 }
 
-void ui_print_stats(GameState *game) {
+void ui_print_stats(Game_State *game) {
   attron(A_REVERSE);
   mvprintw(4, COLS - 12, "STATS");
   attroff(A_REVERSE);
@@ -205,12 +205,12 @@ void ui_print_stats(GameState *game) {
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "frame duration");
   attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%d ms", game->simulationSpeed);
+  mvprintw(line++, print_x + 1, "%d ms", game->simulation_speed);
   line++;
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "frame");
   attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%ld", game->universe.frameCount);
+  mvprintw(line++, print_x + 1, "%ld", game->universe.frame_count);
   line++;
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "cell count");
@@ -273,7 +273,7 @@ void ui_draw_universe_border(int height, int width) {
   attroff(COLOR_PAIR(3));
 }
 
-void ui_draw(GameState *game) {
+void ui_draw(Game_State *game) {
   // clear();
   erase();
 

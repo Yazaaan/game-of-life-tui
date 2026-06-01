@@ -11,17 +11,17 @@ typedef struct {
   int width;
   int height;
   int cells_alive;
-  long frameCount;
+  long frame_count;
 } Universe;
 
 typedef struct {
   Universe universe;
   bool running;
   bool play;
-  int simulationSpeed;
+  int simulation_speed;
   char message[128];
   bool variable_dimension;
-} GameState;
+} Game_State;
 
 Universe get_empty_universe(int height, int width);
 

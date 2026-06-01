@@ -11,7 +11,7 @@ Universe get_empty_universe(int height, int width) {
   universe.width = width;
   universe.height = height;
   universe.cells_alive = 0;
-  universe.frameCount = 0;
+  universe.frame_count = 0;
 
   universe.grid = malloc(universe.height * sizeof(bool *));
   for (int y = 0; y < height; y++) {
@@ -24,7 +24,7 @@ Universe get_empty_universe(int height, int width) {
 void fill_universe_random(Universe *universe) {
   srand(time(NULL));
 
-  universe->frameCount = 0;
+  universe->frame_count = 0;
 
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {
@@ -35,7 +35,7 @@ void fill_universe_random(Universe *universe) {
   }
 }
 
-int count_Neighbours(Universe *universe, int y, int x) {
+int count_neighbours(Universe *universe, int y, int x) {
   int count = 0;
 
   for (int relative_y = -1; relative_y <= 1; relative_y++) {
@@ -86,12 +86,12 @@ void time_step(Universe *universe) {
   Universe next_universe =
       get_empty_universe(universe->height, universe->width);
 
-  next_universe.frameCount = universe->frameCount + 1;
+  next_universe.frame_count = universe->frame_count + 1;
 
   // Regeln durchsetzen
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {
-      int neighbours = count_Neighbours(universe, y, x);
+      int neighbours = count_neighbours(universe, y, x);
 
       // Jede lebendigebdende zelle die ...
       if (universe->grid[y][x] == ALIVE) {

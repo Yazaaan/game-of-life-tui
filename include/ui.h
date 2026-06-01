@@ -9,14 +9,10 @@
 #define MAX_SPEED 1000
 #define MIN_SPEED 25
 
-void ui_init(GameState *state);
+void ui_init(Game_State *state);
 
 void ui_cleanup();
 
-void ui_process_input(GameState* game);
+void ui_process_input(Game_State* game);
 
-//void ui_input_process_keyboard(GameState *state);
-
-//void ui_input_process_mouse(GameState *game);
-
-void ui_draw(GameState *game);
+void ui_draw(Game_State *game);
