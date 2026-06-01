@@ -52,16 +52,15 @@ void ui_input_process_keyboard(GameState *state, int input) {
     sprintf(state->message, "%s", (state->play) ? "Simulating" : "Stop");
     break;
   case 'j':
-    if (state->play)
-      adjust_simulation_speed(state, SPEED_INCREMENT);
+    adjust_simulation_speed(state, SPEED_INCREMENT);
     break;
   case 'l':
-    if (!state->play) {
-      sprintf(state->message, "Stepping a single frame");
+    adjust_simulation_speed(state, -SPEED_INCREMENT);
+    break;
+  case 'm':
+    if (!state->play)
       time_step(&state->universe);
-    } else {
-      adjust_simulation_speed(state, -SPEED_INCREMENT);
-    }
+    sprintf(state->message, "Stepping a single frame");
     break;
   case 'r':
     fill_universe_random(&state->universe);
@@ -98,18 +97,12 @@ void ui_input_process_keyboard(GameState *state, int input) {
 void ui_input_process_mouse(GameState *game, MEVENT *mouse_event) {
   // Mausrad nach oben
   if (mouse_event->bstate & BUTTON4_PRESSED) {
-    if (!game->play) {
-      sprintf(game->message, "Stepping a single frame");
-      time_step(&game->universe);
-    } else {
-      adjust_simulation_speed(game, -SPEED_INCREMENT);
-    }
+    adjust_simulation_speed(game, -SPEED_INCREMENT);
   }
 
   // Mausrad nach unten
   if (mouse_event->bstate & BUTTON5_PRESSED) {
-    if (game->play)
-      adjust_simulation_speed(game, SPEED_INCREMENT);
+    adjust_simulation_speed(game, SPEED_INCREMENT);
   }
 
   // Linksklick
@@ -173,6 +166,7 @@ void ui_print_tooltips(void) {
                   "k",
                   "j/mouse wheel down",
                   "l/mouse wheel up",
+                  "m",
                   "h",
                   "left mouse button"};
   char *explaination[] = {
@@ -181,12 +175,13 @@ void ui_print_tooltips(void) {
       "generate random universe",
       "play/pause",
       "slow down simulation",
-      "speed up simulation/\n  next frame when paused",
+      "speed up simulation",
+      "move to next frame",
       "toggle universe scaling",
       "edit individual cells",
   };
   int line = 6;
-  for (int i = 0; i <= 7; i++) {
+  for (int i = 0; i <= 8; i++) {
     attron(A_BOLD | COLOR_PAIR(1));
     mvprintw(line++, 1, "%s:", keys[i]);
     attroff(A_BOLD | COLOR_PAIR(1));
