@@ -1,6 +1,7 @@
 #include "../include/ui.h"
 #include "../include/engine.h"
 #include "../include/timing.h"
+#include "../include/config.h"
 #include <ncurses.h>
 #include <stdbool.h>
 #include <stdio.h>

@@ -7,7 +7,7 @@ compile: main.o ui.o engine.o timing.o
 main.o: src/main.c include/engine.h
 	gcc $(CFLAGS) -c src/main.c -o main.o
 
-ui.o: src/ui.c include/ui.h include/engine.h
+ui.o: src/ui.c include/ui.h include/engine.h include/config.h
 	gcc $(CFLAGS) -c src/ui.c -o ui.o
 
 engine.o: src/engine.c include/engine.h
