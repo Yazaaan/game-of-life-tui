@@ -1,11 +1,18 @@
 #ifndef ENGINE
 #define ENGINE
 
+// Ob eine Zelle lebendig oder tot ist soll durch einen bool repräsentiert
+// werden. In C gibt es zwar kein bool, aber hiermit wird die Lesbarkeit des
+// Codes verbessert.
 #include <stdbool.h>
 
-#define ALIVE 1
-#define DEAD 0
+// Um die Übersicht weiter zu erhöhen weden zwei defines für tot und lebendig
+// eingeführt
+#define ALIVE true
+#define DEAD false
 
+// Dieses Struct enhält die Spielfläche mit den Zellen und wird weil es alles
+// Enthält "Universum" genannt
 typedef struct {
   bool **grid;
   int width;
@@ -14,6 +21,8 @@ typedef struct {
   long frame_count;
 } Universe;
 
+// Dieses Struct speichert die Spieleinstellungen und enthält ein eingenes
+// Universum
 typedef struct {
   Universe universe;
   bool running;
@@ -25,7 +34,7 @@ typedef struct {
 
 Universe get_empty_universe(int height, int width);
 
-void fill_universe_random(Universe *universe);
+void fill_universe_random(Universe *universe, int ratio);
 
 void change_cell(Universe *universe, int y, int x, bool state);
 

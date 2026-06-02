@@ -5,13 +5,17 @@
 #include <unistd.h>
 
 int main(void) {
-  Game_State game;
-  long long last_update = 0;
+  Game_State
+      game; // Erstellen eines neuen Spiels. Hier drinn wird alles passieren!
+  long long last_update = 0; // Hilfsvariable für die millis()-Funktion.
+                             // Speichert Zeitpunkt der letzten Aktualisierung.
 
   ui_init(&game);
 
+  // Main-Loop
   while (game.running) {
     long long current_time = millis();
+
     ui_process_input(&game);
 
     if (game.play) {
@@ -27,6 +31,6 @@ int main(void) {
   }
 
   ui_cleanup();
-  destroy_universe(&game.universe);
+  destroy_universe(&game.universe); // Speicher freigeben
   return 0;
 }

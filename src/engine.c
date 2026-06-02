@@ -13,6 +13,8 @@ Universe get_empty_universe(int height, int width) {
   universe.cells_alive = 0;
   universe.frame_count = 0;
 
+  // Speicher für das neue Zell-Feld reservieren (Höhe * Speichergröße eines
+  // Pointers)
   universe.grid = malloc(universe.height * sizeof(bool *));
   for (int y = 0; y < height; y++) {
     universe.grid[y] =
@@ -21,27 +23,28 @@ Universe get_empty_universe(int height, int width) {
   return universe;
 }
 
-void fill_universe_random(Universe *universe) {
-  srand(time(NULL));
+// Universum mit zufälligen Zuständen füllen
+void fill_universe_random(Universe *universe, int probability_percent) {
+  srand(time(NULL)); // Seed für den Zufallsgenerator auf Systemzeit setzen
 
   universe->frame_count = 0;
 
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {
-      int r = rand() % 3;
-      int result = (r < 2) ? 0 : 1;
+      int result = (rand() % 100 < probability_percent) ? ALIVE : DEAD;
       change_cell(universe, y, x, result);
     }
   }
 }
 
+// Zählt die Nachbarn um eine Zelle herum und gibt das Ergebnis zurück
 int count_neighbours(Universe *universe, int y, int x) {
   int count = 0;
 
   for (int relative_y = -1; relative_y <= 1; relative_y++) {
     for (int relative_x = -1; relative_x <= 1; relative_x++) {
       if (relative_x == 0 && relative_y == 0)
-        continue;
+        continue; // Soll sich nicht selbs zählen
 
       int check_y = y + relative_y;
       int check_x = x + relative_x;
@@ -59,6 +62,7 @@ int count_neighbours(Universe *universe, int y, int x) {
         check_x = universe->width - 1;
       }
 
+      // Wenn Zelle an Prüfposition gefunden, counter erhöhen
       if (universe->grid[check_y][check_x] == true)
         count++;
     }
@@ -67,12 +71,13 @@ int count_neighbours(Universe *universe, int y, int x) {
   return count;
 }
 
+// Ändert den Zustand einer Zelle in einem Universum
 void change_cell(Universe *universe, int y, int x, bool new_state) {
   bool old_state = universe->grid[y][x];
   universe->grid[y][x] = new_state;
 
-  // Nur wenn der neue Zustand vom alten Zustand unterschiedlich ist, soll
-  // gezählt werden
+  // Nur wenn der neue Zustand vom alten Zustand unterschiedlich ist und die
+  // Zelle lebendig ist, soll gezählt werden
   if (old_state != new_state) {
     if (new_state) {
       universe->cells_alive++;
@@ -82,7 +87,12 @@ void change_cell(Universe *universe, int y, int x, bool new_state) {
   }
 }
 
+// Hier wird eine Zeiteinheit in die Zukunft gegangen und der neue Zustand für
+// jede Zelle auf Basis der Regeln des Spiels neu bestimmt
 void time_step(Universe *universe) {
+  // Es wird ein neues Universum für den neuen Frame angelegt, damit die
+  // Berechnung der neuen Zellzustände auf dem alten Universum ausgeführt werden
+  // können
   Universe next_universe =
       get_empty_universe(universe->height, universe->width);
 
@@ -93,12 +103,12 @@ void time_step(Universe *universe) {
     for (int x = 0; x < universe->width; x++) {
       int neighbours = count_neighbours(universe, y, x);
 
-      // Jede lebendigebdende zelle die ...
+      // Jede lebende Zelle die ...
       if (universe->grid[y][x] == ALIVE) {
         // ... genau 2 oder 3 Nachbarn hat, überlebt
         if (neighbours == 2 || neighbours == 3) {
+          // Zustände werden in dem neuem Universum geändert
           change_cell(&next_universe, y, x, ALIVE);
-          // next_universe.grid[y][x] = ALIVE;
         }
       }
       // Jede tote Zelle die ...
@@ -106,16 +116,17 @@ void time_step(Universe *universe) {
         // ... genau 3 Nachbarn hat wird lebendig
         if (neighbours == 3) {
           change_cell(&next_universe, y, x, ALIVE);
-          // next_universe.grid[y][x] = ALIVE;
         }
       }
     }
   }
 
-  destroy_universe(universe); // Altes Universum loswerden
-  *universe = next_universe;  // Und durch die neue Iteration ersetzten
+  destroy_universe(
+      universe);             // Altes Universum loswerden und Speicher freigeben
+  *universe = next_universe; // Und durch die neue Iteration ersetzten
 }
 
+// Diese Funktion kann die Größe eines Universums anpassen
 void resize_universe(Universe *universe, int new_height, int new_width) {
   int old_height = universe->height;
   int old_width = universe->width;
@@ -124,7 +135,7 @@ void resize_universe(Universe *universe, int new_height, int new_width) {
   // Neues leeres Universum mit neuer Größe erstellen
   *universe = get_empty_universe(new_height, new_width);
 
-  // Bestimme die Grenzen für das Kopieren (immer das Kleinere)
+  // Bestimmen der Grenzen für das Kopieren (immer das Kleinere)
   int copy_height = min(old_height, new_height);
   int copy_width = min(old_width, new_width);
 
@@ -142,6 +153,7 @@ void resize_universe(Universe *universe, int new_height, int new_width) {
   free(old_grid);
 }
 
+// Speicher freigeben, wenn ein Universum nicht mehr gebraucht wird
 void destroy_universe(Universe *universe) {
   for (int i = 0; i < universe->height; i++) {
     free(universe->grid[i]);

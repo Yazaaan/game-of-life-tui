@@ -1,13 +1,16 @@
 #include "../include/ui.h"
+#include "../include/config.h"
 #include "../include/engine.h"
 #include "../include/timing.h"
-#include "../include/config.h"
+#include <iso646.h>
 #include <ncurses.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
 
+// Initialisierung eines neuen "Spiels" ausführen
 void ui_init(Game_State *game) {
+  // Konsole bereit machen
   initscr();
   noecho();
   cbreak();
@@ -18,31 +21,38 @@ void ui_init(Game_State *game) {
   use_default_colors();
   init_pair(1, 12, -1); // Akzentfarbe (12) setzen (Für Hervorhebungen),
                         // Hintergrund (-1) transparent
-  init_pair(2, 8, -1);
-  init_pair(3, 9, -1);
+  init_pair(2, 8, -1);  // Trennlinien
+  init_pair(3, 9, -1);  // Universumsgrenze bei fixem Modus
   mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
-  mouseinterval(0);
+  mouseinterval(0); // Damit die Maus schneller reagiert, wird die Verzögerung
+                    // für Doppelklicks ausgeschaltet
 
+  // Standardwerte festlegen
   game->running = true;
   game->play = false;
   game->simulation_speed = 600;
   game->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
-                                          COLS - GRID_START_X - GRID_MARGIN_X);
+                                      COLS - GRID_START_X - GRID_MARGIN_X);
   sprintf(game->message, "%s", "");
   game->variable_dimension = true;
+
   ui_draw(game);
 }
 
+// ncurses-Terminal beenden
 void ui_cleanup() { endwin(); }
 
+// Zeit pro Frame anpassen
 void adjust_simulation_speed(Game_State *game, int adjustment) {
   int newSpeed = game->simulation_speed + adjustment;
   if (newSpeed <= MAX_SPEED && newSpeed >= MIN_SPEED) {
     game->simulation_speed = newSpeed;
   }
-  sprintf(game->message, "Changed frame time to %d ms.", game->simulation_speed);
+  sprintf(game->message, "Changed frame time to %d ms.",
+          game->simulation_speed);
 }
 
+// Tastatureingabe verarbeiten -> Was passiert bei welcher Taste?
 void ui_input_process_keyboard(Game_State *game, int input) {
   switch (input) {
   case 'q':
@@ -56,7 +66,7 @@ void ui_input_process_keyboard(Game_State *game, int input) {
     adjust_simulation_speed(game, SPEED_INCREMENT);
     break;
   case 'l':
-    adjust_simulation_speed(game, -SPEED_INCREMENT);
+    adjust_simulation_speed(game, - SPEED_INCREMENT);
     break;
   case 'm':
     if (!game->play)
@@ -64,14 +74,14 @@ void ui_input_process_keyboard(Game_State *game, int input) {
     sprintf(game->message, "Stepping a single frame");
     break;
   case 'r':
-    fill_universe_random(&game->universe);
+    fill_universe_random(&game->universe, RANDOM_CELL_PROBABILITY);
     game->play = false;
     sprintf(game->message, "The Big Bang!");
     break;
   case 'c':
     if (game->variable_dimension) {
       game->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
-                                           COLS - GRID_START_X - GRID_MARGIN_X);
+                                          COLS - GRID_START_X - GRID_MARGIN_X);
     } else {
       game->universe =
           get_empty_universe(game->universe.height, game->universe.width);
@@ -88,13 +98,13 @@ void ui_input_process_keyboard(Game_State *game, int input) {
       game->variable_dimension = true;
       resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
                       COLS - GRID_START_X - GRID_MARGIN_X);
-      sprintf(game->message,
-              "Universe size is now depending on terminal size");
+      sprintf(game->message, "Universe size is now depending on terminal size");
     }
     break;
   }
 }
 
+// Mauseingabe verarbeiten
 void ui_input_process_mouse(Game_State *game, MEVENT *mouse_event) {
   // Mausrad nach oben
   if (mouse_event->bstate & BUTTON4_PRESSED) {
@@ -133,6 +143,7 @@ void ui_input_process_mouse(Game_State *game, MEVENT *mouse_event) {
   }
 }
 
+// Allgemeine Eingabeverarbeitung
 void ui_process_input(Game_State *game) {
   int input = getch(); // Hole den Input
 
@@ -156,6 +167,7 @@ void ui_process_input(Game_State *game) {
   ui_draw(game);
 }
 
+// Drucken der Steuerungserklärung am linken Rand
 void ui_print_tooltips(void) {
   attron(A_REVERSE);
   mvprintw(4, 9, "CONTROLS");
@@ -170,17 +182,15 @@ void ui_print_tooltips(void) {
                   "m",
                   "h",
                   "left mouse button"};
-  char *explanation[] = {
-      "quit",
-      "clear universe",
-      "generate random universe",
-      "play/pause",
-      "slow down simulation",
-      "speed up simulation",
-      "move to next frame",
-      "toggle universe scaling",
-      "edit individual cells",
-  };
+  char *explanation[] = {"quit",
+                         "clear universe",
+                         "generate random universe",
+                         "play/pause",
+                         "slow down simulation",
+                         "speed up simulation",
+                         "move to next frame",
+                         "toggle universe scaling",
+                         "edit individual cells"};
   int line = 6;
   for (int i = 0; i <= 8; i++) {
     attron(A_BOLD | COLOR_PAIR(1));
@@ -191,6 +201,7 @@ void ui_print_tooltips(void) {
   }
 }
 
+// Drucken der Statistiken am rechten Rand
 void ui_print_stats(Game_State *game) {
   attron(A_REVERSE);
   mvprintw(4, COLS - 12, "STATS");
@@ -231,6 +242,7 @@ void ui_print_stats(Game_State *game) {
            game->universe.height);
 }
 
+// Drucken der Trennlinien zwischen den UI-Elementen
 void ui_print_dividers(void) {
   attron(COLOR_PAIR(2));
   // Horizontale Line unter Überschrift
@@ -254,6 +266,7 @@ void ui_print_dividers(void) {
   attroff(COLOR_PAIR(2));
 }
 
+// Die Universumsgrenze zeichnen
 void ui_draw_universe_border(int height, int width) {
   attron(COLOR_PAIR(3));
 
@@ -274,6 +287,9 @@ void ui_draw_universe_border(int height, int width) {
   attroff(COLOR_PAIR(3));
 }
 
+// TODO: Draw Message mit Akzentfarbe (message kann aus Game_State weg?)
+
+// Orchestriert das Zeichnen der Benutzerberfläche
 void ui_draw(Game_State *game) {
   // clear();
   erase();
@@ -282,13 +298,10 @@ void ui_draw(Game_State *game) {
   mvprintw(1, COLS / 2 - 10, " Conway's GAME OF LIFE ");
   attroff(A_REVERSE);
 
-  // Steuerungserklärung am linken Rand
   ui_print_tooltips();
 
-  // Statusinformationen am rechten Rand
   ui_print_stats(game);
 
-  // Trennlinien zwischen UI-Elementen
   ui_print_dividers();
 
   // Informationszeile am unteren Rand
