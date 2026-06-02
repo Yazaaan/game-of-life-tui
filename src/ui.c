@@ -1,12 +1,12 @@
 #include "../include/ui.h"
 #include "../include/config.h"
 #include "../include/engine.h"
-#include "../include/timing.h"
 #include <iso646.h>
 #include <ncurses.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <unistd.h>
+
+char global_message[128] = ""; // Globale Varialble für aktuelle Infonachricht
 
 // Initialisierung eines neuen "Spiels" ausführen
 void ui_init(Game_State *game) {
@@ -23,6 +23,7 @@ void ui_init(Game_State *game) {
                         // Hintergrund (-1) transparent
   init_pair(2, 8, -1);  // Trennlinien
   init_pair(3, 9, -1);  // Universumsgrenze bei fixem Modus
+  init_pair(4, 10, -1); // Feedback-Nachricht unten
   mousemask(ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION, NULL);
   mouseinterval(0); // Damit die Maus schneller reagiert, wird die Verzögerung
                     // für Doppelklicks ausgeschaltet
@@ -33,7 +34,6 @@ void ui_init(Game_State *game) {
   game->simulation_speed = 600;
   game->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
                                       COLS - GRID_START_X - GRID_MARGIN_X);
-  sprintf(game->message, "%s", "");
   game->variable_dimension = true;
 
   ui_draw(game);
@@ -48,8 +48,7 @@ void adjust_simulation_speed(Game_State *game, int adjustment) {
   if (newSpeed <= MAX_SPEED && newSpeed >= MIN_SPEED) {
     game->simulation_speed = newSpeed;
   }
-  sprintf(game->message, "Changed frame time to %d ms.",
-          game->simulation_speed);
+  set_message("Changed frame time to %d ms.", game->simulation_speed);
 }
 
 // Tastatureingabe verarbeiten -> Was passiert bei welcher Taste?
@@ -60,23 +59,23 @@ void ui_input_process_keyboard(Game_State *game, int input) {
     break;
   case 'k':
     game->play = !game->play;
-    sprintf(game->message, "%s", (game->play) ? "Simulating" : "Stop");
+    set_message((game->play) ? "Simulating" : "Stop");
     break;
   case 'j':
     adjust_simulation_speed(game, SPEED_INCREMENT);
     break;
   case 'l':
-    adjust_simulation_speed(game, - SPEED_INCREMENT);
+    adjust_simulation_speed(game, -SPEED_INCREMENT);
     break;
   case 'm':
     if (!game->play)
       time_step(&game->universe);
-    sprintf(game->message, "Stepping a single frame");
+    set_message("Stepping a single frame");
     break;
   case 'r':
     fill_universe_random(&game->universe, RANDOM_CELL_PROBABILITY);
     game->play = false;
-    sprintf(game->message, "The Big Bang!");
+    set_message("The Big Bang!");
     break;
   case 'c':
     if (game->variable_dimension) {
@@ -87,18 +86,18 @@ void ui_input_process_keyboard(Game_State *game, int input) {
           get_empty_universe(game->universe.height, game->universe.width);
     }
     game->play = false;
-    sprintf(game->message, "%s", "Space for something new!");
+    set_message("Space for something new!");
     break;
   case 'h':
     if (game->variable_dimension) {
       game->variable_dimension = false;
-      sprintf(game->message, "Universe size is now fixed (%d x %d)",
-              game->universe.width, game->universe.height);
+      set_message("Universe size is now fixed (%d x %d)", game->universe.width,
+                  game->universe.height);
     } else {
       game->variable_dimension = true;
       resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
                       COLS - GRID_START_X - GRID_MARGIN_X);
-      sprintf(game->message, "Universe size is now depending on terminal size");
+      set_message("Universe size is now depending on terminal size");
     }
     break;
   }
@@ -132,13 +131,10 @@ void ui_input_process_mouse(Game_State *game, MEVENT *mouse_event) {
 
       game->universe.frame_count = 0;
 
-      snprintf(game->message, 128,
-               "Edit mode: changed cell at x:%d, y:%d to %s", click_x, click_y,
-               (*cell) ? "alive" : "dead");
+      set_message("Edit mode: changed cell at x:%d, y:%d to %s", click_x,
+                  click_y, (*cell) ? "alive" : "dead");
     } else {
-
-      snprintf(game->message, 128, "Edit mode: out of bounds at x:%d, y:%d",
-               click_x, click_y);
+      set_message("Edit mode: out of bounds at x:%d, y:%d", click_x, click_y);
     }
   }
 }
@@ -287,7 +283,12 @@ void ui_draw_universe_border(int height, int width) {
   attroff(COLOR_PAIR(3));
 }
 
-// TODO: Draw Message mit Akzentfarbe (message kann aus Game_State weg?)
+// Informationszeile am unteren Rand
+void ui_draw_message() {
+  attron(COLOR_PAIR(4));
+  mvprintw(LINES - 1, GRID_START_X, "> %s", global_message);
+  attroff(COLOR_PAIR(4));
+}
 
 // Orchestriert das Zeichnen der Benutzerberfläche
 void ui_draw(Game_State *game) {
@@ -304,9 +305,7 @@ void ui_draw(Game_State *game) {
 
   ui_print_dividers();
 
-  // Informationszeile am unteren Rand
-  mvprintw(LINES - 1, GRID_START_X, "> %s", game->message);
-
+  ui_draw_message();
   // Spielfeld zeichnen
   for (int y = 0; y < game->universe.height; y++) {
     for (int x = 0; x < game->universe.width; x++) {

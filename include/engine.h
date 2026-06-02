@@ -28,7 +28,6 @@ typedef struct {
   bool running;
   bool play;
   int simulation_speed;
-  char message[128];
   bool variable_dimension;
 } Game_State;
 
