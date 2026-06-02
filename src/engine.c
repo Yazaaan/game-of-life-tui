@@ -6,10 +6,11 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
 // Leeres Universum erzeugen in dem jede Zelle tot ist
-Universe get_empty_universe(int height, int width) {
+Universe get_empty_universe(int height, int width, bool variable_dimension) {
   Universe universe;
   universe.width = width;
   universe.height = height;
+  universe.variable_dimension = variable_dimension;
   universe.cells_alive = 0;
   universe.frame_count = 0;
 
@@ -94,7 +95,7 @@ void time_step(Universe *universe) {
   // Berechnung der neuen Zellzustände auf dem alten Universum ausgeführt werden
   // können
   Universe next_universe =
-      get_empty_universe(universe->height, universe->width);
+      get_empty_universe(universe->height, universe->width, universe->variable_dimension);
 
   next_universe.frame_count = universe->frame_count + 1;
 
@@ -133,7 +134,7 @@ void resize_universe(Universe *universe, int new_height, int new_width) {
   bool **old_grid = universe->grid;
 
   // Neues leeres Universum mit neuer Größe erstellen
-  *universe = get_empty_universe(new_height, new_width);
+  *universe = get_empty_universe(new_height, new_width, universe->variable_dimension);
 
   // Bestimmen der Grenzen für das Kopieren (immer das Kleinere)
   int copy_height = min(old_height, new_height);

@@ -32,9 +32,9 @@ void ui_init(Game_State *game) {
   game->running = true;
   game->play = false;
   game->simulation_speed = 600;
-  game->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
-                                      COLS - GRID_START_X - GRID_MARGIN_X);
-  game->variable_dimension = true;
+  game->universe =
+      get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
+                         COLS - GRID_START_X - GRID_MARGIN_X, true);
 
   ui_draw(game);
 }
@@ -78,23 +78,25 @@ void ui_input_process_keyboard(Game_State *game, int input) {
     set_message("The Big Bang!");
     break;
   case 'c':
-    if (game->variable_dimension) {
+    if (game->universe.variable_dimension) {
       game->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
-                                          COLS - GRID_START_X - GRID_MARGIN_X);
+                                          COLS - GRID_START_X - GRID_MARGIN_X,
+                                          game->universe.variable_dimension);
     } else {
       game->universe =
-          get_empty_universe(game->universe.height, game->universe.width);
+          get_empty_universe(game->universe.height, game->universe.width,
+                             game->universe.variable_dimension);
     }
     game->play = false;
     set_message("Space for something new!");
     break;
   case 'h':
-    if (game->variable_dimension) {
-      game->variable_dimension = false;
+    if (game->universe.variable_dimension) {
+      game->universe.variable_dimension = false;
       set_message("Universe size is now fixed (%d x %d)", game->universe.width,
                   game->universe.height);
     } else {
-      game->variable_dimension = true;
+      game->universe.variable_dimension = true;
       resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
                       COLS - GRID_START_X - GRID_MARGIN_X);
       set_message("Universe size is now depending on terminal size");
@@ -151,7 +153,7 @@ void ui_process_input(Game_State *game) {
     }
     // Terminal-Resize
   } else if (input == KEY_RESIZE) {
-    if (game->variable_dimension) {
+    if (game->universe.variable_dimension) {
       resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
                       COLS - GRID_START_X - GRID_MARGIN_X);
     }
@@ -229,7 +231,7 @@ void ui_print_stats(Game_State *game) {
   mvprintw(line++, print_x, "%s:", "scaling mode");
   attroff(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x + 1, "%s",
-           game->variable_dimension ? "dynamic" : "fixed");
+           game->universe.variable_dimension ? "dynamic" : "fixed");
   line++;
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "dimensions");
@@ -283,6 +285,24 @@ void ui_draw_universe_border(int height, int width) {
   attroff(COLOR_PAIR(3));
 }
 
+// Spielfeld zeichnen
+void ui_draw_universe(Universe *universe) {
+  for (int y = 0; y < universe->height; y++) {
+    for (int x = 0; x < universe->width; x++) {
+      if (y + GRID_START_Y < LINES - GRID_MARGIN_Y &&
+          x + GRID_START_X < COLS - GRID_MARGIN_X) {
+        mvaddch(y + GRID_START_Y, x + GRID_START_X,
+                (universe->grid[y][x] == ALIVE) ? ACS_BLOCK : ' ');
+      }
+    }
+  }
+
+  // Bei fixer Universumgröße eine Begrenzung zeichnen
+  if (!universe->variable_dimension) {
+    ui_draw_universe_border(universe->height, universe->width);
+  }
+}
+
 // Informationszeile am unteren Rand
 void ui_draw_message() {
   attron(COLOR_PAIR(4));
@@ -295,32 +315,15 @@ void ui_draw(Game_State *game) {
   // clear();
   erase();
 
-  attron(A_REVERSE); // Highlight für die Info-Zeile
+  attron(A_BOLD | A_REVERSE); // Highlight für die Info-Zeile
   mvprintw(1, COLS / 2 - 10, " Conway's GAME OF LIFE ");
-  attroff(A_REVERSE);
+  attroff(A_BOLD | A_REVERSE);
 
   ui_print_tooltips();
-
   ui_print_stats(game);
-
   ui_print_dividers();
-
+  ui_draw_universe(&game->universe);
   ui_draw_message();
-  // Spielfeld zeichnen
-  for (int y = 0; y < game->universe.height; y++) {
-    for (int x = 0; x < game->universe.width; x++) {
-      if (y + GRID_START_Y < LINES - GRID_MARGIN_Y &&
-          x + GRID_START_X < COLS - GRID_MARGIN_X) {
-        mvaddch(y + GRID_START_Y, x + GRID_START_X,
-                (game->universe.grid[y][x] == ALIVE) ? ACS_BLOCK : ' ');
-      }
-    }
-  }
-
-  // Bei fixer Universumgröße eine Begrenzung zeichnen
-  if (!game->variable_dimension) {
-    ui_draw_universe_border(game->universe.height, game->universe.width);
-  }
 
   refresh();
 }

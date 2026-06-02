@@ -17,6 +17,7 @@ typedef struct {
   bool **grid;
   int width;
   int height;
+  bool variable_dimension;
   int cells_alive;
   long frame_count;
 } Universe;
@@ -28,10 +29,9 @@ typedef struct {
   bool running;
   bool play;
   int simulation_speed;
-  bool variable_dimension;
 } Game_State;
 
-Universe get_empty_universe(int height, int width);
+Universe get_empty_universe(int height, int width, bool variable_dimension);
 
 void fill_universe_random(Universe *universe, int ratio);
 
