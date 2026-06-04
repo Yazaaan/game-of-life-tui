@@ -1,7 +1,7 @@
 #include "../include/ui.h"
-#include  "../include/prints.h"
 #include "../include/config.h"
 #include "../include/engine.h"
+#include "../include/prints.h"
 #include <iso646.h>
 #include <ncurses.h>
 #include <stdbool.h>
@@ -41,7 +41,12 @@ void ui_init(Game_State *game) {
 }
 
 // ncurses-Terminal beenden
-void ui_cleanup() { endwin(); }
+void ui_cleanup(void) {
+  // Beendet ncurses-Modus sicher
+  if (!isendwin()) {
+    endwin();
+  }
+}
 
 // Zeit pro Frame anpassen
 void adjust_simulation_speed(Game_State *game, int adjustment) {
@@ -70,36 +75,41 @@ void ui_input_process_keyboard(Game_State *game, int input) {
     break;
   case 'm':
     if (!game->play)
-      time_step(&game->universe);
+      time_step(game->universe);
     set_message("Stepping a single frame");
     break;
   case 'r':
-    fill_universe_random(&game->universe, RANDOM_CELL_PROBABILITY);
+    fill_universe_random(game->universe, RANDOM_CELL_PROBABILITY);
     game->play = false;
     set_message("The Big Bang!");
     break;
   case 'c':
-    if (game->universe.variable_dimension) {
-      game->universe = get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
-                                          COLS - GRID_START_X - GRID_MARGIN_X,
-                                          game->universe.variable_dimension);
+    bool var_dim = game->universe->variable_dimension;
+    int new_height, new_width;
+
+    if (var_dim) {
+      new_height = LINES - GRID_START_Y - GRID_MARGIN_Y;
+      new_width = COLS - GRID_START_X - GRID_MARGIN_X;
     } else {
-      game->universe =
-          get_empty_universe(game->universe.height, game->universe.width,
-                             game->universe.variable_dimension);
+      new_height = game->universe->height;
+      new_width = game->universe->width;
     }
+
+    reset_universe(game->universe, new_height, new_width);
+
     game->play = false;
     set_message("Space for something new!");
     break;
   case 'h':
-    if (game->universe.variable_dimension) {
-      game->universe.variable_dimension = false;
-      set_message("Universe size is now fixed (%d x %d)", game->universe.width,
-                  game->universe.height);
+    if (game->universe->variable_dimension) {
+      game->universe->variable_dimension = false;
+      set_message("Universe size is now fixed (%d x %d)", game->universe->width,
+                  game->universe->height);
     } else {
-      game->universe.variable_dimension = true;
-      resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
-                      COLS - GRID_START_X - GRID_MARGIN_X);
+      game->universe->variable_dimension = true;
+      game->universe =
+          resize_universe(game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
+                          COLS - GRID_START_X - GRID_MARGIN_X);
       set_message("Universe size is now depending on terminal size");
     }
     break;
@@ -125,17 +135,17 @@ void ui_input_process_mouse(Game_State *game, MEVENT *mouse_event) {
     int click_y = mouse_event->y - GRID_START_Y;
     int click_x = mouse_event->x - GRID_START_X;
 
-    if (click_y < game->universe.height && click_y >= 0 &&
-        click_x < game->universe.width && click_x >= 0) {
-      bool *cell = &game->universe.grid[click_y][click_x];
+    if (click_y < game->universe->height && click_y >= 0 &&
+        click_x < game->universe->width && click_x >= 0) {
 
       // Zustand wechseln
-      change_cell(&game->universe, click_y, click_x, !*cell);
+      bool cell = get_cell_state(game->universe, click_y, click_x);
+      change_cell(game->universe, click_y, click_x, !cell);
 
-      game->universe.frame_count = 0;
+      game->universe->frame_count = 0;
 
       set_message("Edit mode: changed cell at x:%d, y:%d to %s", click_x,
-                  click_y, (*cell) ? "alive" : "dead");
+                  click_y, (cell) ? "alive" : "dead");
     } else {
       set_message("Edit mode: out of bounds at x:%d, y:%d", click_x, click_y);
     }
@@ -154,9 +164,10 @@ void ui_process_input(Game_State *game) {
     }
     // Terminal-Resize
   } else if (input == KEY_RESIZE) {
-    if (game->universe.variable_dimension) {
-      resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
-                      COLS - GRID_START_X - GRID_MARGIN_X);
+    if (game->universe->variable_dimension) {
+      game->universe =
+          resize_universe(game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
+                          COLS - GRID_START_X - GRID_MARGIN_X);
     }
     // Tastatureingabe verarbeiten
   } else if (input != ERR) {
@@ -218,7 +229,7 @@ void ui_draw_universe(Universe *universe) {
       if (y + GRID_START_Y < LINES - GRID_MARGIN_Y &&
           x + GRID_START_X < COLS - GRID_MARGIN_X) {
         mvaddch(y + GRID_START_Y, x + GRID_START_X,
-                (universe->grid[y][x] == ALIVE) ? ACS_BLOCK : ' ');
+                (get_cell_state(universe, y, x) == ALIVE) ? ACS_BLOCK : ' ');
       }
     }
   }
@@ -245,7 +256,7 @@ void ui_draw(Game_State *game) {
   print_controls();
   print_stats(game);
   ui_print_dividers();
-  ui_draw_universe(&game->universe);
+  ui_draw_universe(game->universe);
   ui_draw_message();
 
   refresh();

@@ -58,22 +58,22 @@ void print_stats(Game_State *game) {
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "frame");
   attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%ld", game->universe.frame_count);
+  mvprintw(line++, print_x + 1, "%ld", game->universe->frame_count);
   line++;
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "cell count");
   attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%d", game->universe.cells_alive);
+  mvprintw(line++, print_x + 1, "%d", game->universe->cells_alive);
   line++;
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "scaling mode");
   attroff(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x + 1, "%s",
-           game->universe.variable_dimension ? "dynamic" : "fixed");
+           game->universe->variable_dimension ? "dynamic" : "fixed");
   line++;
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "dimensions");
   attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%d x %d", game->universe.width,
-           game->universe.height);
+  mvprintw(line++, print_x + 1, "%d x %d", game->universe->width,
+           game->universe->height);
 }

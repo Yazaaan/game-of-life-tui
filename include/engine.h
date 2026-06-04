@@ -14,7 +14,7 @@
 // Dieses Struct enhält die Spielfläche mit den Zellen und wird weil es alles
 // Enthält "Universum" genannt
 typedef struct {
-  bool **grid;  // TODO: Auf 1D-Array ändern!
+  bool *grid;
   int width;
   int height;
   bool variable_dimension;
@@ -25,13 +25,18 @@ typedef struct {
 // Dieses Struct speichert die Spieleinstellungen und enthält ein eingenes
 // Universum
 typedef struct {
-  Universe universe;
+  Universe *universe;
   bool running;
   bool play;
   int simulation_speed;
 } Game_State;
 
-Universe get_empty_universe(int height, int width, bool variable_dimension);
+bool get_cell_state(Universe *universe, int y, int x);
+
+Universe *get_empty_universe(int height, int width, bool variable_dimension);
+
+Universe *reset_universe(Universe *old_universe, int target_height,
+                         int target_width);
 
 void fill_universe_random(Universe *universe, int ratio);
 
@@ -39,7 +44,8 @@ void change_cell(Universe *universe, int y, int x, bool state);
 
 void time_step(Universe *universe);
 
-void resize_universe(Universe *old_universe, int new_height, int new_width);
+Universe *resize_universe(Universe *old_universe, int new_height,
+                          int new_width);
 
 void destroy_universe(Universe *universe);
 

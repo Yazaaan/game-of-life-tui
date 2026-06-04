@@ -13,6 +13,8 @@ int main(void) {
 
   ui_init(&game);
 
+  atexit(ui_cleanup);
+
   // Main-Loop
   while (game.running) {
     long long current_time = millis();
@@ -22,7 +24,7 @@ int main(void) {
     if (game.play) {
       if (current_time - last_update >= game.simulation_speed) {
         last_update = millis();
-        time_step(&game.universe);
+        time_step(game.universe);
         ui_draw(&game);
       }
     }
@@ -32,6 +34,6 @@ int main(void) {
   }
 
   ui_cleanup();
-  destroy_universe(&game.universe); // Speicher freigeben
+  destroy_universe(game.universe); // Speicher freigeben
   return EXIT_SUCCESS;
 }
