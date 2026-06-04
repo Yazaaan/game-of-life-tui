@@ -16,10 +16,15 @@ Universe get_empty_universe(int height, int width, bool variable_dimension) {
 
   // Speicher für das neue Zell-Feld reservieren (Höhe * Speichergröße eines
   // Pointers)
+  // TODO: Auf NULL prüfen!!! (Alle malloc und calloc)
   universe.grid = malloc(universe.height * sizeof(bool *));
+  if (universe.grid == NULL) {
+    // for-Schleife mit free
+    // WAS TUN???
+  }
   for (int y = 0; y < height; y++) {
     universe.grid[y] =
-        calloc(width, sizeof(bool)); // calloc setzt alles auf false
+        calloc(width, sizeof(bool)); // calloc setzt alles auf false (0)
   }
   return universe;
 }
@@ -94,8 +99,8 @@ void time_step(Universe *universe) {
   // Es wird ein neues Universum für den neuen Frame angelegt, damit die
   // Berechnung der neuen Zellzustände auf dem alten Universum ausgeführt werden
   // können
-  Universe next_universe =
-      get_empty_universe(universe->height, universe->width, universe->variable_dimension);
+  Universe next_universe = get_empty_universe(universe->height, universe->width,
+                                              universe->variable_dimension);
 
   next_universe.frame_count = universe->frame_count + 1;
 
@@ -134,7 +139,8 @@ void resize_universe(Universe *universe, int new_height, int new_width) {
   bool **old_grid = universe->grid;
 
   // Neues leeres Universum mit neuer Größe erstellen
-  *universe = get_empty_universe(new_height, new_width, universe->variable_dimension);
+  *universe =
+      get_empty_universe(new_height, new_width, universe->variable_dimension);
 
   // Bestimmen der Grenzen für das Kopieren (immer das Kleinere)
   int copy_height = min(old_height, new_height);

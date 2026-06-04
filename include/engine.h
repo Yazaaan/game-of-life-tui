@@ -14,7 +14,7 @@
 // Dieses Struct enhält die Spielfläche mit den Zellen und wird weil es alles
 // Enthält "Universum" genannt
 typedef struct {
-  bool **grid;
+  bool **grid;  // TODO: Auf 1D-Array ändern!
   int width;
   int height;
   bool variable_dimension;

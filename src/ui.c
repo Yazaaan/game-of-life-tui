@@ -1,4 +1,5 @@
 #include "../include/ui.h"
+#include  "../include/prints.h"
 #include "../include/config.h"
 #include "../include/engine.h"
 #include <iso646.h>
@@ -165,81 +166,6 @@ void ui_process_input(Game_State *game) {
   ui_draw(game);
 }
 
-// Drucken der Steuerungserklärung am linken Rand
-void ui_print_tooltips(void) {
-  attron(A_REVERSE);
-  mvprintw(4, 9, "CONTROLS");
-  attroff(A_REVERSE);
-
-  char *keys[] = {"q",
-                  "c",
-                  "r",
-                  "k",
-                  "j/mouse wheel down",
-                  "l/mouse wheel up",
-                  "m",
-                  "h",
-                  "left mouse button"};
-  char *explanation[] = {"quit",
-                         "clear universe",
-                         "generate random universe",
-                         "play/pause",
-                         "slow down simulation",
-                         "speed up simulation",
-                         "move to next frame",
-                         "toggle universe scaling",
-                         "edit individual cells"};
-  int line = 6;
-  for (int i = 0; i <= 8; i++) {
-    attron(A_BOLD | COLOR_PAIR(1));
-    mvprintw(line++, 1, "%s:", keys[i]);
-    attroff(A_BOLD | COLOR_PAIR(1));
-    mvprintw(line++, 2, "%s", explanation[i]);
-    line++;
-  }
-}
-
-// Drucken der Statistiken am rechten Rand
-void ui_print_stats(Game_State *game) {
-  attron(A_REVERSE);
-  mvprintw(4, COLS - 12, "STATS");
-  attroff(A_REVERSE);
-
-  int line = 6;
-  int print_x = COLS - GRID_MARGIN_X + 2;
-  attron(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x, "%s:", "game");
-  attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%s", game->play ? "running" : "stopped");
-  line++;
-  attron(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x, "%s:", "frame duration");
-  attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%d ms", game->simulation_speed);
-  line++;
-  attron(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x, "%s:", "frame");
-  attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%ld", game->universe.frame_count);
-  line++;
-  attron(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x, "%s:", "cell count");
-  attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%d", game->universe.cells_alive);
-  line++;
-  attron(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x, "%s:", "scaling mode");
-  attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%s",
-           game->universe.variable_dimension ? "dynamic" : "fixed");
-  line++;
-  attron(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x, "%s:", "dimensions");
-  attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, "%d x %d", game->universe.width,
-           game->universe.height);
-}
-
 // Drucken der Trennlinien zwischen den UI-Elementen
 void ui_print_dividers(void) {
   attron(COLOR_PAIR(2));
@@ -315,12 +241,9 @@ void ui_draw(Game_State *game) {
   // clear();
   erase();
 
-  attron(A_BOLD | A_REVERSE); // Highlight für die Info-Zeile
-  mvprintw(1, COLS / 2 - 10, " Conway's GAME OF LIFE ");
-  attroff(A_BOLD | A_REVERSE);
-
-  ui_print_tooltips();
-  ui_print_stats(game);
+  print_headline();
+  print_controls();
+  print_stats(game);
   ui_print_dividers();
   ui_draw_universe(&game->universe);
   ui_draw_message();

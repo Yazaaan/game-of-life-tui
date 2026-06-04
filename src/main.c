@@ -2,6 +2,7 @@
 #include "../include/timing.h"
 #include "../include/ui.h"
 #include <stdbool.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 int main(void) {
@@ -32,5 +33,5 @@ int main(void) {
 
   ui_cleanup();
   destroy_universe(&game.universe); // Speicher freigeben
-  return 0;
+  return EXIT_SUCCESS;
 }
