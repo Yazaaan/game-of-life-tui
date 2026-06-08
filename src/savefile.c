@@ -29,8 +29,8 @@ int save_grid(Universe *universe, int slot) {
   return 0;
 }
 
-int load_grid(Universe *universe, int slot) {
-  if (universe == NULL) {
+int load_grid(Universe **universe_ptr, int slot) {
+  if (universe_ptr == NULL || *universe_ptr == NULL) {
     return 1;
   }
 
@@ -48,7 +48,10 @@ int load_grid(Universe *universe, int slot) {
     return 1;
   }
 
-  reset_universe(universe, height, width);
+  // reset_universe(universe, height, width);
+  resize_universe(universe_ptr, height, width);
+
+  Universe *universe = *universe_ptr;
 
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {

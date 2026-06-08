@@ -15,12 +15,12 @@ inline bool get_cell_state(Universe *universe, int y, int x) {
 
 // Ändert den Zustand einer Zelle in einem Universum
 void change_cell(Universe *universe, int y, int x, bool new_state) {
-  bool old_state = get_cell_state(universe, y, x);
+  bool state = get_cell_state(universe, y, x);
   universe->grid[y * universe->width + x] = new_state;
 
   // Nur wenn der neue Zustand vom alten Zustand unterschiedlich ist und die
   // Zelle lebendig ist, soll gezählt werden
-  if (old_state != new_state) {
+  if (state != new_state) {
     if (new_state) {
       universe->cells_alive++;
     } else {
@@ -54,8 +54,7 @@ Universe *get_empty_universe(int height, int width, bool variable_dimension) {
 }
 
 // Eigene Funktion um ein Universum zu leeren
-void reset_universe(Universe *universe, int target_height,
-                         int target_width) {
+void reset_universe(Universe *universe, int target_height, int target_width) {
   if (universe == NULL)
     exit(EXIT_FAILURE);
 
@@ -165,11 +164,11 @@ void time_step(Universe *universe) {
 }
 
 // Diese Funktion kann die Größe eines Universums anpassen
-Universe *resize_universe(Universe *old_universe, int new_height,
-                          int new_width) {
-  if (old_universe == NULL)
+void resize_universe(Universe **universe_ptr, int new_height, int new_width) {
+  if (universe_ptr == NULL || *universe_ptr == NULL)
     exit(EXIT_FAILURE);
 
+  Universe *old_universe = *universe_ptr;
   Universe *new_universe = get_empty_universe(new_height, new_width,
                                               old_universe->variable_dimension);
 
@@ -187,7 +186,7 @@ Universe *resize_universe(Universe *old_universe, int new_height,
   // Speicher freigeben
   destroy_universe(old_universe);
 
-  return new_universe;
+  *universe_ptr = new_universe;
 }
 
 // Speicher freigeben, wenn ein Universum nicht mehr gebraucht wird

@@ -109,9 +109,8 @@ void ui_input_process_keyboard(Game_State *game, int input) {
                   game->universe->height);
     } else {
       game->universe->variable_dimension = true;
-      game->universe =
-          resize_universe(game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
-                          COLS - GRID_START_X - GRID_MARGIN_X);
+      resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
+                      COLS - GRID_START_X - GRID_MARGIN_X);
       set_message("Universe size is now depending on terminal size");
     }
     break;
@@ -137,7 +136,7 @@ void ui_input_process_keyboard(Game_State *game, int input) {
                       slot);
         }
       } else {
-        if (load_grid(game->universe, slot) == 0) {
+        if (load_grid(&game->universe, slot) == 0) {
           set_message("Universe loadeded from slot %d with fixed size!", slot);
         } else {
           set_message("There was an error loading the universe from slot %d!",
@@ -197,9 +196,8 @@ void ui_process_input(Game_State *game) {
     // Terminal-Resize
   } else if (input == KEY_RESIZE) {
     if (game->universe->variable_dimension) {
-      game->universe =
-          resize_universe(game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
-                          COLS - GRID_START_X - GRID_MARGIN_X);
+      resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
+                      COLS - GRID_START_X - GRID_MARGIN_X);
     }
     // Tastatureingabe verarbeiten
   } else if (input != ERR) {
