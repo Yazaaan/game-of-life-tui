@@ -54,12 +54,12 @@ Universe *get_empty_universe(int height, int width, bool variable_dimension) {
 }
 
 // Eigene Funktion um ein Universum zu leeren
-void reset_universe(Universe *universe, int target_height, int target_width) {
+void reset_universe(Universe *universe) {
   if (universe == NULL)
     exit(EXIT_FAILURE);
 
   memset(universe->grid, DEAD,
-         target_height * target_width *
+         universe->height * universe->width *
              sizeof(bool)); // Füllt alles ab der Adresse vom Grid bis zu
                             // seinem Ende mit Nullen
 

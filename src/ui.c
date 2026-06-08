@@ -110,7 +110,7 @@ void ui_input_process_keyboard(Game_State *game, int input) {
       game->universe->variable_dimension = true;
       set_message("You found the Glider Gun!!!");
     } else {
-      reset_universe(game->universe, new_height, new_width);
+      reset_universe(game->universe);
       set_message("Space for something new!");
     }
 

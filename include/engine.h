@@ -36,8 +36,7 @@ bool get_cell_state(Universe *universe, int y, int x);
 
 Universe *get_empty_universe(int height, int width, bool variable_dimension);
 
-void reset_universe(Universe *old_universe, int target_height,
-                         int target_width);
+void reset_universe(Universe *old_universe);
 
 void fill_universe_random(Universe *universe, int ratio);
 
