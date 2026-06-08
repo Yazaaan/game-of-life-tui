@@ -34,13 +34,15 @@ int load_grid(Universe **universe_ptr, int slot) {
     return 1;
   }
 
-  if((unsigned int) slot > 10){
+  if ((unsigned int)slot > 10) {
     return 1;
   }
 
   char filename[32];
   if (slot == 10) {
     sprintf(filename, "saves/welcome.universe");
+  } else if (slot == 11) {
+    sprintf(filename, "saves/glider_gun.universe");
   } else {
     sprintf(filename, "saves/save_%d.universe", slot);
   }

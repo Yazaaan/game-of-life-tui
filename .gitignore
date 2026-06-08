@@ -3,6 +3,7 @@
 # saves-Ordner bis auf das Wilkommensuniversum ausnehmen
 saves/*
 !saves/welcome.universe
+!saves/glider_gun.universe
 
 # Prerequisites
 *.d

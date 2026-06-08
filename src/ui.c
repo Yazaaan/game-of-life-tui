@@ -94,8 +94,9 @@ void ui_input_process_keyboard(Game_State *game, int input) {
   case 'c':
     bool var_dim = game->universe->variable_dimension;
     int new_height, new_width;
+    int ccount = game->universe->cells_alive;
 
-    if (var_dim) {
+    if (var_dim || ccount == 0) {
       new_height = LINES - GRID_START_Y - GRID_MARGIN_Y;
       new_width = COLS - GRID_START_X - GRID_MARGIN_X;
     } else {
@@ -103,10 +104,17 @@ void ui_input_process_keyboard(Game_State *game, int input) {
       new_width = game->universe->width;
     }
 
-    reset_universe(game->universe, new_height, new_width);
+    if (ccount == 0) {
+      load_grid(&game->universe, 11);
+      resize_universe(&game->universe, new_height, new_width);
+      game->universe->variable_dimension = true;
+      set_message("You found the Glider Gun!!!");
+    } else {
+      reset_universe(game->universe, new_height, new_width);
+      set_message("Space for something new!");
+    }
 
     game->play = false;
-    set_message("Space for something new!");
     break;
   case 'h':
     if (game->universe->variable_dimension) {
