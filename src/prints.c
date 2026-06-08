@@ -2,8 +2,9 @@
 #include "../include/engine.h"
 #include <ncurses.h>
 
-int num_controls = 8;
+int num_controls = 9;
 char *controls[][2] = {{"q", "quit"},
+                       {"s", "toggle save/load mode"},
                        {"c", "clear universe"},
                        {"r", "generate random universe"},
                        {"k", "play/pause"},
@@ -70,6 +71,11 @@ void print_stats(Game_State *game) {
   attroff(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x + 1, "%s",
            game->universe->variable_dimension ? "dynamic" : "fixed");
+  attron(A_BOLD | COLOR_PAIR(1));
+  line++;
+  mvprintw(line++, print_x, "%s:", "save mode");
+  attroff(A_BOLD | COLOR_PAIR(1));
+  mvprintw(line++, print_x + 1, (game->save_mode) ? "true" : "false");
   line++;
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "dimensions");

@@ -1,7 +1,7 @@
 #ifndef UI
 #define UI
 
-#include "../include/engine.h"
+#include "engine.h"
 
 // Ersetzt snprintf durch set_message für die Lesbarkeit
 #include <stdio.h>

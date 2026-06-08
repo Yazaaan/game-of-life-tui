@@ -1,7 +1,7 @@
 #ifndef PRINTS 
 #define PRINTS
 
-#include "../include/engine.h"
+#include "engine.h"
 
 void print_headline();
 

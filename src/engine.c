@@ -8,7 +8,7 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
 inline bool get_cell_state(Universe *universe, int y, int x) {
-  if (y >= universe->height || x >= universe->width)
+  if ((unsigned int)y >= universe->height || (unsigned int)x >= universe->width)
     return DEAD;
   return universe->grid[y * universe->width + x];
 }
@@ -54,20 +54,18 @@ Universe *get_empty_universe(int height, int width, bool variable_dimension) {
 }
 
 // Eigene Funktion um ein Universum zu leeren
-Universe *reset_universe(Universe *old_universe, int target_height,
+void reset_universe(Universe *universe, int target_height,
                          int target_width) {
-  if (old_universe == NULL)
+  if (universe == NULL)
     exit(EXIT_FAILURE);
 
-  memset(old_universe->grid, DEAD,
+  memset(universe->grid, DEAD,
          target_height * target_width *
              sizeof(bool)); // Füllt alles ab der Adresse vom Grid bis zu
                             // seinem Ende mit Nullen
 
-  old_universe->cells_alive = 0;
-  old_universe->frame_count = 0;
-
-  return old_universe;
+  universe->cells_alive = 0;
+  universe->frame_count = 0;
 }
 
 // Universum mit zufälligen Zuständen füllen
@@ -75,7 +73,9 @@ void fill_universe_random(Universe *universe, int probability_percent) {
   if (universe == NULL)
     exit(EXIT_FAILURE);
 
-  srand(time(NULL)); // Seed für den Zufallsgenerator auf Systemzeit setzen
+  srand(time(NULL) +
+        universe->cells_alive); // Seed für den Zufallsgenerator auf Systemzeit
+                                // + Anzahl Zellen aus altem Universum setzen
 
   universe->frame_count = 0;
 

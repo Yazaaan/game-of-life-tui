@@ -29,13 +29,14 @@ typedef struct {
   bool running;
   bool play;
   int simulation_speed;
+  bool save_mode;
 } Game_State;
 
 bool get_cell_state(Universe *universe, int y, int x);
 
 Universe *get_empty_universe(int height, int width, bool variable_dimension);
 
-Universe *reset_universe(Universe *old_universe, int target_height,
+void reset_universe(Universe *old_universe, int target_height,
                          int target_width);
 
 void fill_universe_random(Universe *universe, int ratio);

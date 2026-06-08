@@ -2,6 +2,7 @@
 #include "../include/config.h"
 #include "../include/engine.h"
 #include "../include/prints.h"
+#include "../include/savefile.h"
 #include <iso646.h>
 #include <ncurses.h>
 #include <stdbool.h>
@@ -38,6 +39,7 @@ void ui_init(Game_State *game) {
                          COLS - GRID_START_X - GRID_MARGIN_X, true);
 
   ui_draw(game);
+  set_message("Load universe from slot by pressing any number from 0 to 9.");
 }
 
 // ncurses-Terminal beenden
@@ -113,6 +115,36 @@ void ui_input_process_keyboard(Game_State *game, int input) {
       set_message("Universe size is now depending on terminal size");
     }
     break;
+  case 's':
+    game->save_mode = !game->save_mode;
+    if (game->save_mode) {
+      set_message(
+          "Press any number from 0 to 9 to save current universe to slot.");
+
+    } else {
+      set_message(
+          "Load universe from slot by pressing any number from 0 to 9.");
+    }
+    break;
+  default:
+    if (input >= '0' && input <= '9') {
+      int slot = input - '0';
+      if (game->save_mode) {
+        if (save_grid(game->universe, slot) == 0) {
+          set_message("Universe saved to slot %d!", slot);
+        } else {
+          set_message("There was an error saving the universe to disk slot %d!",
+                      slot);
+        }
+      } else {
+        if (load_grid(game->universe, slot) == 0) {
+          set_message("Universe loadeded from slot %d with fixed size!", slot);
+        } else {
+          set_message("There was an error loading the universe from slot %d!",
+                      slot);
+        }
+      }
+    }
   }
 }
 
