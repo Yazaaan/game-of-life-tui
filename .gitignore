@@ -1,5 +1,9 @@
 # .gitignore-Datei von https://github.com/github/gitignore/blob/main/C.gitignore
 
+# saves-Ordner bis auf das Wilkommensuniversum ausnehmen
+saves/*
+!saves/welcome.universe
+
 # Prerequisites
 *.d
 

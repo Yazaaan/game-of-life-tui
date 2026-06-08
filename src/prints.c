@@ -73,9 +73,9 @@ void print_stats(Game_State *game) {
            game->universe->variable_dimension ? "dynamic" : "fixed");
   attron(A_BOLD | COLOR_PAIR(1));
   line++;
-  mvprintw(line++, print_x, "%s:", "save mode");
+  mvprintw(line++, print_x, "%s:", "file mode");
   attroff(A_BOLD | COLOR_PAIR(1));
-  mvprintw(line++, print_x + 1, (game->save_mode) ? "true" : "false");
+  mvprintw(line++, print_x + 1, (game->save_mode) ? "save" : "load");
   line++;
   attron(A_BOLD | COLOR_PAIR(1));
   mvprintw(line++, print_x, "%s:", "dimensions");

@@ -34,12 +34,18 @@ void ui_init(Game_State *game) {
   game->running = true;
   game->play = false;
   game->simulation_speed = 600;
-  game->universe =
-      get_empty_universe(LINES - GRID_START_Y - GRID_MARGIN_Y,
-                         COLS - GRID_START_X - GRID_MARGIN_X, true);
 
-  ui_draw(game);
+  int init_height = LINES - GRID_START_Y - GRID_MARGIN_Y;
+  int init_width = COLS - GRID_START_X - GRID_MARGIN_X;
+  game->universe = get_empty_universe(init_height, init_width, true);
+
+  // Willkommens-Universum laden
+  load_grid(&game->universe, 10);
+  resize_universe(&game->universe, init_height, init_width);
+  game->universe->variable_dimension = true;
+
   set_message("Load universe from slot by pressing any number from 0 to 9.");
+  ui_draw(game);
 }
 
 // ncurses-Terminal beenden

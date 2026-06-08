@@ -10,7 +10,7 @@ int save_grid(Universe *universe, int slot) {
   }
 
   char filename[32];
-  sprintf(filename, "save_%d.universe", slot);
+  sprintf(filename, "saves/save_%d.universe", slot);
   FILE *file = fopen(filename, "w");
 
   if (file == NULL) {
@@ -34,10 +34,18 @@ int load_grid(Universe **universe_ptr, int slot) {
     return 1;
   }
 
-  char filename[32];
-  sprintf(filename, "save_%d.universe", slot);
-  FILE *file = fopen(filename, "r");
+  if((unsigned int) slot > 10){
+    return 1;
+  }
 
+  char filename[32];
+  if (slot == 10) {
+    sprintf(filename, "saves/welcome.universe");
+  } else {
+    sprintf(filename, "saves/save_%d.universe", slot);
+  }
+
+  FILE *file = fopen(filename, "r");
   if (file == NULL) {
     return 1;
   }
