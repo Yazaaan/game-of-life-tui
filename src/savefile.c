@@ -34,7 +34,7 @@ int load_grid(Universe **universe_ptr, int slot) {
     return 1;
   }
 
-  if ((unsigned int)slot > 10) {
+  if ((unsigned int)slot > 11) {
     return 1;
   }
 

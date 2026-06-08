@@ -158,6 +158,7 @@ void ui_input_process_keyboard(Game_State *game, int input) {
         }
       }
     }
+    break;
   }
 }
 
