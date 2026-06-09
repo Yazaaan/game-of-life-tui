@@ -1,6 +1,10 @@
 CFLAGS = -Wall -Iinclude
 LDFLAGS = -lncurses
 
+.PHONY: all compile test
+
+all: compile test
+
 compile: main.o ui.o engine.o timing.o prints.o savefile.o
 	gcc main.o ui.o engine.o timing.o prints.o savefile.o -o game_of_life $(LDFLAGS)
 
