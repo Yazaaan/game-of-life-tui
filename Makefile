@@ -28,11 +28,12 @@ clean:
 
 # Tests
 
-test: test_engine.o engine.o lib/unity/unity.o
-	echo "Tests in Makefile einbauen!"
+test: test_engine.o engine.o unity.o
+	gcc test_engine.o engine.o unity.o -o test_engine $(LDFLAGS)
+	./test_engine
 
-test_engine.o: test_engine.c engine.h
-	echo "Tests in Makefile einbauen!"
+test_engine.o: tests/test_engine.c include/engine.h
+	gcc $(CFLAGS) -c tests/test_engine.c -o test_engine.o
 
-lib/unity/unity.o: lib/unity/unity.c lib/unity/unity.h lib/unity/unity_internals.h
-	echo "Tests in Makefile einbauen!"
+unity.o: lib/unity/unity.c lib/unity/unity.h lib/unity/unity_internals.h
+	gcc $(CFLAGS) -c lib/unity/unity.c -o unity.o
