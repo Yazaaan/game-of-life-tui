@@ -95,8 +95,9 @@ void ui_input_process_keyboard(Game_State *game, int input) {
     bool var_dim = game->universe->variable_dimension;
     int new_height, new_width;
     int ccount = game->universe->cells_alive;
+    int fcount = game->universe->frame_count;
 
-    if (var_dim || ccount == 0) {
+    if (var_dim || ccount + fcount == 0) {
       new_height = LINES - GRID_START_Y - GRID_MARGIN_Y;
       new_width = COLS - GRID_START_X - GRID_MARGIN_X;
     } else {
@@ -104,7 +105,7 @@ void ui_input_process_keyboard(Game_State *game, int input) {
       new_width = game->universe->width;
     }
 
-    if (ccount == 0) {
+    if (ccount + fcount == 0) {
       load_grid(&game->universe, 11);
       resize_universe(&game->universe, new_height, new_width);
       game->universe->variable_dimension = true;

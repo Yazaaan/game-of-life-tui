@@ -40,12 +40,13 @@ void reset_universe(Universe *old_universe);
 
 void fill_universe_random(Universe *universe, int ratio);
 
+int count_neighbours(Universe *universe, int y, int x);
+
 void change_cell(Universe *universe, int y, int x, bool state);
 
 void time_step(Universe *universe);
 
-void resize_universe(Universe **old_universe, int new_height,
-                          int new_width);
+void resize_universe(Universe **old_universe, int new_height, int new_width);
 
 void destroy_universe(Universe *universe);
 

@@ -24,7 +24,7 @@ savefile.o: src/savefile.c include/savefile.h
 
 
 clean:
-	rm -f *.o game_of_life lib/unity/unity.o
+	rm -f *.o game_of_life test_engine
 
 # Tests
 

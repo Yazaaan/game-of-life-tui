@@ -5,6 +5,8 @@ saves/*
 !saves/welcome.universe
 !saves/glider_gun.universe
 
+object_files/*
+
 # Prerequisites
 *.d
 
