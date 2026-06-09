@@ -15,6 +15,9 @@ inline bool get_cell_state(Universe *universe, int y, int x) {
 
 // Ändert den Zustand einer Zelle in einem Universum
 void change_cell(Universe *universe, int y, int x, bool new_state) {
+  if (y >= universe->height || x >= universe->width || y < 0 || x < 0)
+    exit(EXIT_FAILURE);
+
   bool state = get_cell_state(universe, y, x);
   universe->grid[y * universe->width + x] = new_state;
 

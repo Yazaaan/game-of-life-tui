@@ -16,6 +16,48 @@ void tearDown(void) {
 
 // --- Tests ---
 
+// - Zellzustand ändern -
+
+// tot zu lebendig
+void test_change_cell_dead_to_alive(void) {
+  int target_y = 2;
+  int target_x = 2;
+
+  // Zelle auf ALIVE setzen
+  change_cell(test_universe, target_y, target_x, ALIVE);
+
+  // Zelle ist ALIVE, cells_alive ist 1
+  TEST_ASSERT_TRUE(get_cell_state(test_universe, target_y, target_x));
+  TEST_ASSERT_EQUAL_INT(1, test_universe->cells_alive);
+
+  target_y = 3;
+  target_x = 3;
+
+  // Weitere Zelle auf ALIVE setzen
+  change_cell(test_universe, target_y, target_x, ALIVE);
+
+  // Zelle ist ALIVE, cells_alive ist 2
+  TEST_ASSERT_TRUE(get_cell_state(test_universe, target_y, target_x));
+  TEST_ASSERT_EQUAL_INT(2, test_universe->cells_alive);
+}
+
+// lebendig zu tot
+void test_change_cell_alive_to_dead(void) {
+  int target_y = 1;
+  int target_x = 1;
+
+  // Zelle auf ALIVE setzen
+  change_cell(test_universe, target_y, target_x, ALIVE);
+  TEST_ASSERT_EQUAL_INT(1, test_universe->cells_alive);
+
+  // Zelle wieder auf DEAD setzen
+  change_cell(test_universe, target_y, target_x, DEAD);
+
+  // Zelle ist DEAD, cells_alive ist wieder 0
+  TEST_ASSERT_FALSE(get_cell_state(test_universe, target_y, target_x));
+  TEST_ASSERT_EQUAL_INT(0, test_universe->cells_alive);
+}
+
 // - Nachbarn zählen -
 
 // Zelle in der Mitte ohne Nachbarn. Ergebnis sollte 0 sein.
@@ -163,6 +205,9 @@ void test_time_step_blinker_oscillates(void) {
 // --- Tests ausführen ---
 int main(void) {
   UNITY_BEGIN();
+  RUN_TEST(test_change_cell_dead_to_alive);
+  RUN_TEST(test_change_cell_alive_to_dead);
+
   RUN_TEST(test_count_neighbours_empty);
   RUN_TEST(test_count_neighbours_single);
   RUN_TEST(test_count_neighbours_full);
