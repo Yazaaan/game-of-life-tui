@@ -170,6 +170,10 @@ void resize_universe(Universe **universe_ptr, int new_height, int new_width) {
   if (universe_ptr == NULL || *universe_ptr == NULL)
     exit(EXIT_FAILURE);
 
+  // Absichern gegen zu kleine oder negative Werte
+  if(new_height < 3) new_height = 3;
+  if(new_width < 3) new_width = 3;
+
   Universe *old_universe = *universe_ptr;
   Universe *new_universe = get_empty_universe(new_height, new_width,
                                               old_universe->variable_dimension);

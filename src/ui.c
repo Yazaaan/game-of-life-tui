@@ -10,6 +10,25 @@
 
 char global_message[128] = ""; // Globale Varialble für aktuelle Infonachricht
 
+// Ist das Termianl besonders klein?
+bool small_terminal_mode(void) {
+  return LINES < TERMINAL_MIN_HEIGHT || COLS < TERMINAL_MIN_WIDTH;
+}
+
+// Universumshöhe angepasst auf Terminal-Größe
+int get_available_height() {
+  if (small_terminal_mode())
+    return LINES - 1;
+  return LINES - GRID_START_Y - GRID_MARGIN_Y;
+}
+
+// Universumsbreite angepasst auf Terminal-Größe
+int get_available_width() {
+  if (small_terminal_mode())
+    return COLS;
+  return COLS - GRID_START_X - GRID_MARGIN_X;
+}
+
 // Initialisierung eines neuen "Spiels" ausführen
 void ui_init(Game_State *game) {
   // Konsole bereit machen
@@ -35,14 +54,14 @@ void ui_init(Game_State *game) {
   game->play = false;
   game->simulation_speed = 600;
 
-  int init_height = LINES - GRID_START_Y - GRID_MARGIN_Y;
-  int init_width = COLS - GRID_START_X - GRID_MARGIN_X;
-  game->universe = get_empty_universe(init_height, init_width, true);
+  int init_height = get_available_height();
+  int init_width = get_available_width();
+  game->universe = get_empty_universe(init_height, init_width, START_VARIABLE_SIZE);
 
   // Willkommens-Universum laden
   load_grid(&game->universe, 10);
   resize_universe(&game->universe, init_height, init_width);
-  game->universe->variable_dimension = true;
+  game->universe->variable_dimension = START_VARIABLE_SIZE;
 
   set_message("Load universe from slot by pressing any number from 0 to 9.");
   ui_draw(game);
@@ -98,8 +117,8 @@ void ui_input_process_keyboard(Game_State *game, int input) {
     int fcount = game->universe->frame_count;
 
     if (var_dim || ccount + fcount == 0) {
-      new_height = LINES - GRID_START_Y - GRID_MARGIN_Y;
-      new_width = COLS - GRID_START_X - GRID_MARGIN_X;
+      new_height = get_available_height();
+      new_width = get_available_width();
     } else {
       new_height = game->universe->height;
       new_width = game->universe->width;
@@ -124,8 +143,9 @@ void ui_input_process_keyboard(Game_State *game, int input) {
                   game->universe->height);
     } else {
       game->universe->variable_dimension = true;
-      resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
-                      COLS - GRID_START_X - GRID_MARGIN_X);
+      resize_universe(&game->universe, get_available_height(),
+                      get_available_width());
+
       set_message("Universe size is now depending on terminal size");
     }
     break;
@@ -179,8 +199,16 @@ void ui_input_process_mouse(Game_State *game, MEVENT *mouse_event) {
   if (mouse_event->bstate & BUTTON1_PRESSED) {
     game->play = false;
     // Mausposition im Gitter speichern
-    int click_y = mouse_event->y - GRID_START_Y;
-    int click_x = mouse_event->x - GRID_START_X;
+    int click_y;
+    int click_x;
+
+    if (small_terminal_mode()) {
+      click_y = mouse_event->y;
+      click_x = mouse_event->x;
+    } else {
+      click_y = mouse_event->y - GRID_START_Y;
+      click_x = mouse_event->x - GRID_START_X;
+    }
 
     if (click_y < game->universe->height && click_y >= 0 &&
         click_x < game->universe->width && click_x >= 0) {
@@ -212,8 +240,8 @@ void ui_process_input(Game_State *game) {
     // Terminal-Resize
   } else if (input == KEY_RESIZE) {
     if (game->universe->variable_dimension) {
-      resize_universe(&game->universe, LINES - GRID_START_Y - GRID_MARGIN_Y,
-                      COLS - GRID_START_X - GRID_MARGIN_X);
+      resize_universe(&game->universe, get_available_height(),
+                      get_available_width());
     }
     // Tastatureingabe verarbeiten
   } else if (input != ERR) {
@@ -269,12 +297,12 @@ void ui_draw_universe_border(int height, int width) {
 }
 
 // Spielfeld zeichnen
-void ui_draw_universe(Universe *universe) {
+void ui_draw_universe(Universe *universe, int offset_y, int offset_x,
+                      int margin_y, int margin_x) {
   for (int y = 0; y < universe->height; y++) {
     for (int x = 0; x < universe->width; x++) {
-      if (y + GRID_START_Y < LINES - GRID_MARGIN_Y &&
-          x + GRID_START_X < COLS - GRID_MARGIN_X) {
-        mvaddch(y + GRID_START_Y, x + GRID_START_X,
+      if (y + offset_y < LINES - margin_y && x + offset_x < COLS - margin_x) {
+        mvaddch(y + offset_y, x + offset_x,
                 (get_cell_state(universe, y, x) == ALIVE) ? ACS_BLOCK : ' ');
       }
     }
@@ -287,9 +315,9 @@ void ui_draw_universe(Universe *universe) {
 }
 
 // Informationszeile am unteren Rand
-void ui_draw_message() {
+void ui_draw_message(int pos_y, int pos_x) {
   attron(COLOR_PAIR(4));
-  mvprintw(LINES - 1, GRID_START_X, "> %s", global_message);
+  mvprintw(pos_y, pos_x, "> %s", global_message);
   attroff(COLOR_PAIR(4));
 }
 
@@ -298,12 +326,19 @@ void ui_draw(Game_State *game) {
   // clear();
   erase();
 
-  print_headline();
-  print_controls();
-  print_stats(game);
-  ui_print_dividers();
-  ui_draw_universe(game->universe);
-  ui_draw_message();
+  // Die komplette UI wird nur gezeichnet, wenn das Terminal groß genug ist
+  if (!small_terminal_mode()) {
+    print_headline();
+    print_controls();
+    print_stats(game);
+    ui_print_dividers();
+    ui_draw_universe(game->universe, GRID_START_Y, GRID_START_X, GRID_MARGIN_Y,
+                     GRID_MARGIN_X);
+    ui_draw_message(LINES - 1, GRID_START_X);
+  } else {
+    ui_draw_universe(game->universe, 0, 0, 1, 0);
+    ui_draw_message(LINES - 1, 0);
+  }
 
   refresh();
 }
