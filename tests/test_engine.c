@@ -202,9 +202,59 @@ void test_time_step_blinker_oscillates(void) {
   TEST_ASSERT_FALSE(get_cell_state(test_universe, 3, 2));
 }
 
+// - Resize -
+
+// Vergrößern
+void test_resize_universe_expansion(void) {
+  // Vorbereitung: Eine Zelle an Randpositionen auf "ALIVE" setzen
+  change_cell(test_universe, 0, 0, ALIVE);
+  change_cell(test_universe, 4, 4, ALIVE);
+
+  resize_universe(&test_universe, 10, 10);
+
+  TEST_ASSERT_EQUAL_INT(10, test_universe->width);
+  TEST_ASSERT_EQUAL_INT(10, test_universe->height);
+
+  // Die alten Zellen müssen noch da sein
+  TEST_ASSERT_TRUE(get_cell_state(test_universe, 0, 0));
+  TEST_ASSERT_TRUE(get_cell_state(test_universe, 4, 4));
+
+  // Eine neue Zelle im erweiterten Bereich muss am Anfang tot sein
+  TEST_ASSERT_FALSE(get_cell_state(test_universe, 9, 9));
+}
+
+// Verkleinern
+void test_resize_universe_shrinkage(void) {
+  // Vorbereitung: Eine Zelle an (4,4) lebendig machen
+  change_cell(test_universe, 4, 4, ALIVE);
+
+  resize_universe(&test_universe, 3, 3);
+
+  TEST_ASSERT_EQUAL_INT(3, test_universe->width);
+  TEST_ASSERT_EQUAL_INT(3, test_universe->height);
+
+  // Die Zelle (4,4) ist nun außerhalb des neuen Grids und darf nicht mehr
+  // zugänglich sein.
+  TEST_ASSERT_FALSE(get_cell_state(test_universe, 2, 2));
+}
+
+// Gleichbleibend
+void test_resize_universe_unchanged(void) {
+  change_cell(test_universe, 2, 2, ALIVE);
+  change_cell(test_universe, 4, 4, ALIVE);
+
+  resize_universe(&test_universe, 5, 5);
+
+  TEST_ASSERT_EQUAL_INT(5, test_universe->height);
+  TEST_ASSERT_EQUAL_INT(5, test_universe->width);
+  TEST_ASSERT_TRUE(get_cell_state(test_universe, 2, 2));
+  TEST_ASSERT_TRUE(get_cell_state(test_universe, 4, 4));
+}
+
 // --- Tests ausführen ---
 int main(void) {
   UNITY_BEGIN();
+
   RUN_TEST(test_change_cell_dead_to_alive);
   RUN_TEST(test_change_cell_alive_to_dead);
 
@@ -219,6 +269,10 @@ int main(void) {
   RUN_TEST(test_time_step_reproduction);
   RUN_TEST(test_time_step_stable_block);
   RUN_TEST(test_time_step_blinker_oscillates);
+
+  RUN_TEST(test_resize_universe_expansion);
+  RUN_TEST(test_resize_universe_shrinkage);
+  RUN_TEST(test_resize_universe_unchanged);
 
   return UNITY_END();
 }

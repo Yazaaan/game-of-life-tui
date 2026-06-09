@@ -46,7 +46,6 @@ Universe *get_empty_universe(int height, int width, bool variable_dimension) {
   universe->frame_count = 0;
 
   // Speicher für das neue Zell-Feld reservieren (Höhe * Breite * Speichergröße)
-
   universe->grid = (bool *)calloc(height * width, sizeof(bool));
   if (universe->grid == NULL) {
     free(universe);
