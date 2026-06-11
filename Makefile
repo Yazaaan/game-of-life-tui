@@ -5,13 +5,13 @@ LDFLAGS = -lncurses
 
 all: compile test
 
-compile: main.o ui.o engine.o timing.o prints.o savefile.o
-	gcc main.o ui.o engine.o timing.o prints.o savefile.o -o game_of_life $(LDFLAGS)
+compile: main.o ui.o engine.o timing.o render.o savefile.o
+	gcc main.o ui.o engine.o timing.o render.o savefile.o -o game_of_life $(LDFLAGS)
 
 main.o: src/main.c include/engine.h
 	gcc $(CFLAGS) -c src/main.c -o main.o
 
-ui.o: src/ui.c include/ui.h include/engine.h include/config.h include/prints.h include/savefile.h
+ui.o: src/ui.c include/ui.h include/engine.h include/config.h include/render.h include/savefile.h
 	gcc $(CFLAGS) -c src/ui.c -o ui.o
 
 engine.o: src/engine.c include/engine.h
@@ -20,8 +20,8 @@ engine.o: src/engine.c include/engine.h
 timing.o: src/timing.c include/timing.h
 	gcc $(CFLAGS) -c src/timing.c -o timing.o
 
-prints.o: src/prints.c include/prints.h 
-	gcc $(CFLAGS) -c src/prints.c -o prints.o
+render.o: src/render.c include/render.h 
+	gcc $(CFLAGS) -c src/render.c -o render.o
 
 savefile.o: src/savefile.c include/savefile.h
 	gcc $(CFLAGS) -c src/savefile.c -o savefile.o

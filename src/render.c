@@ -30,7 +30,7 @@ void print_controls() {
   int line = 6;
   for (int i = 0; i <= num_controls; i++) {
     if (line >= LINES - GRID_MARGIN_Y - 1) {
-      mvprintw(line - 1, 9, "...");
+      mvprintw(line - 1, 11, "...");
       break;
     }
     attron(A_BOLD | COLOR_PAIR(1));

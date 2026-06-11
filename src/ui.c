@@ -1,7 +1,7 @@
 #include "../include/ui.h"
 #include "../include/config.h"
 #include "../include/engine.h"
-#include "../include/prints.h"
+#include "../include/render.h"
 #include "../include/savefile.h"
 #include <iso646.h>
 #include <ncurses.h>
