@@ -100,7 +100,7 @@ void ui_input_process_keyboard(Game_State *game, int input) {
   case 'l':
     adjust_simulation_speed(game, -SPEED_INCREMENT);
     break;
-  case 'm':
+  case 'n':
     if (!game->play)
       time_step(game->universe);
     set_message("Stepping a single frame");
@@ -251,76 +251,6 @@ void ui_process_input(Game_State *game) {
   ui_draw(game);
 }
 
-// Drucken der Trennlinien zwischen den UI-Elementen
-void ui_print_dividers(void) {
-  attron(COLOR_PAIR(2));
-  // Horizontale Line unter Überschrift
-  for (int i = 0; i <= COLS; i++) {
-    mvprintw(3, i, "-");
-  }
-  // Horizontale Line unter Universum
-  int line_hight = LINES - GRID_MARGIN_Y;
-  for (int i = 0; i <= COLS; i++) {
-    mvprintw(line_hight, i, "-");
-  }
-  // Verticale Linie links
-  int line_pos_x = GRID_START_X - 1;
-  for (int i = 4; i < line_hight; i++) {
-    mvprintw(i, line_pos_x, "|");
-  }
-  line_pos_x = COLS - GRID_MARGIN_X;
-  for (int i = 4; i < line_hight; i++) {
-    mvprintw(i, line_pos_x, "|");
-  }
-  attroff(COLOR_PAIR(2));
-}
-
-// Die Universumsgrenze zeichnen
-void ui_draw_universe_border(int height, int width) {
-  attron(COLOR_PAIR(3));
-
-  // Rechte Wand
-  if (COLS > GRID_START_X + width + GRID_MARGIN_X) {
-    for (int y = GRID_START_Y;
-         y < GRID_START_Y + height && y < LINES - GRID_MARGIN_Y; y++) {
-      mvaddch(y, GRID_START_X + width, '.');
-    }
-  }
-  // Untere Wand
-  if (LINES > GRID_START_Y + height + GRID_MARGIN_Y) {
-    for (int x = GRID_START_X;
-         x <= GRID_START_X + width && x < COLS - GRID_MARGIN_X; x++) {
-      mvaddch(GRID_START_Y + height, x, '.');
-    }
-  }
-  attroff(COLOR_PAIR(3));
-}
-
-// Spielfeld zeichnen
-void ui_draw_universe(Universe *universe, int offset_y, int offset_x,
-                      int margin_y, int margin_x) {
-  for (int y = 0; y < universe->height; y++) {
-    for (int x = 0; x < universe->width; x++) {
-      if (y + offset_y < LINES - margin_y && x + offset_x < COLS - margin_x) {
-        mvaddch(y + offset_y, x + offset_x,
-                (get_cell_state(universe, y, x) == ALIVE) ? ACS_BLOCK : ' ');
-      }
-    }
-  }
-
-  // Bei fixer Universumgröße eine Begrenzung zeichnen
-  if (!universe->variable_dimension) {
-    ui_draw_universe_border(universe->height, universe->width);
-  }
-}
-
-// Informationszeile am unteren Rand
-void ui_draw_message(int pos_y, int pos_x) {
-  attron(COLOR_PAIR(4));
-  mvprintw(pos_y, pos_x, "> %s", global_message);
-  attroff(COLOR_PAIR(4));
-}
-
 // Orchestriert das Zeichnen der Benutzerberfläche
 void ui_draw(Game_State *game) {
   // clear();
@@ -331,13 +261,13 @@ void ui_draw(Game_State *game) {
     print_headline();
     print_controls();
     print_stats(game);
-    ui_print_dividers();
-    ui_draw_universe(game->universe, GRID_START_Y, GRID_START_X, GRID_MARGIN_Y,
+    print_dividers();
+    print_universe(game->universe, GRID_START_Y, GRID_START_X, GRID_MARGIN_Y,
                      GRID_MARGIN_X);
-    ui_draw_message(LINES - 1, GRID_START_X);
+    print_message(LINES - 1, GRID_START_X, global_message);
   } else {
-    ui_draw_universe(game->universe, 0, 0, 1, 0);
-    ui_draw_message(LINES - 1, 0);
+    print_universe(game->universe, 0, 0, 1, 0);
+    print_message(LINES - 1, 0, global_message);
   }
 
   refresh();
