@@ -1,6 +1,6 @@
 #ifndef TIMING
 #define TIMING
 
-long long millis();
+long long millis(void);
 
 #endif // !TIMING

@@ -11,8 +11,8 @@
 #define ALIVE true
 #define DEAD false
 
-// Dieses Struct enhält die Spielfläche mit den Zellen und wird weil es alles
-// Enthält "Universum" genannt
+// Dieses Struct enhält die Spielfläche mit den Zellen sowie wichtige
+// Eigenschaften und wird weil es alles enthält "Universum" genannt.
 typedef struct {
   bool *grid;
   int width;
@@ -36,9 +36,9 @@ bool get_cell_state(Universe *universe, int y, int x);
 
 Universe *get_empty_universe(int height, int width, bool variable_dimension);
 
-void reset_universe(Universe *old_universe);
+void reset_universe(Universe *universe);
 
-void fill_universe_random(Universe *universe, int ratio);
+void fill_universe_random(Universe *universe, int probability_percent);
 
 int count_neighbours(Universe *universe, int y, int x);
 

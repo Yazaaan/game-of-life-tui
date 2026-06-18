@@ -16,20 +16,21 @@ void ui_action_key_scaling_mode(Game_State *game);
 void ui_action_key_save_toggle(Game_State *game);
 void ui_action_key_save_to_slot(Game_State *game, int slot);
 
-// Ist das Termianl besonders klein?
+// Prüft, ob das Terminal zu klein für das Standard-Layout ist, um ein
+// entsprechendes Fallback-Layout zu ermöglichen.
 bool small_terminal_mode(void) {
   return LINES < TERMINAL_MIN_HEIGHT || COLS < TERMINAL_MIN_WIDTH;
 }
 
 // Universumshöhe angepasst auf Terminal-Größe
-int get_available_height() {
+int get_available_height(void) {
   if (small_terminal_mode())
     return LINES - 1;
   return LINES - GRID_START_Y - GRID_MARGIN_Y;
 }
 
 // Universumsbreite angepasst auf Terminal-Größe
-int get_available_width() {
+int get_available_width(void) {
   if (small_terminal_mode())
     return COLS;
   return COLS - GRID_START_X - GRID_MARGIN_X;

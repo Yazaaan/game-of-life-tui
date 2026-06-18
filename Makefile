@@ -28,7 +28,7 @@ savefile.o: src/savefile.c include/savefile.h
 
 
 clean:
-	rm -f *.o game_of_life test_engine
+	rm -f *.o game_of_life test_engine test_savefile
 
 # Tests
 

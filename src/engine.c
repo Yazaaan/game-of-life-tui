@@ -98,7 +98,7 @@ int count_neighbours(Universe *universe, int y, int x) {
   for (int relative_y = -1; relative_y <= 1; relative_y++) {
     for (int relative_x = -1; relative_x <= 1; relative_x++) {
       if (relative_x == 0 && relative_y == 0)
-        continue; // Soll sich nicht selbs zählen
+        continue; // Soll sich nicht selbst zählen
 
       int check_y = y + relative_y;
       int check_x = x + relative_x;

@@ -138,6 +138,7 @@ void test_time_step_overpopulation(void) {
   TEST_ASSERT_FALSE(get_cell_state(test_universe, 2, 2));
 }
 
+// Zelle wird geboren
 void test_time_step_reproduction(void) {
   change_cell(test_universe, 1, 1, ALIVE);
   change_cell(test_universe, 1, 2, ALIVE);

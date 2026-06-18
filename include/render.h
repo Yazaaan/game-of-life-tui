@@ -3,9 +3,9 @@
 
 #include "engine.h"
 
-void print_headline();
+void print_headline(void);
 
-void print_controls();
+void print_controls(void);
 
 void print_stats(Game_State *game);
 

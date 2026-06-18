@@ -15,14 +15,14 @@ char *controls[][2] = {{"q", "quit"},
                        {"left mouse button", "edit individual cells"}};
 
 // Drucken der Überschrift
-void print_headline() {
+void print_headline(void) {
   attron(A_BOLD | A_REVERSE);
   mvprintw(1, COLS / 2 - 10, " Conway's GAME OF LIFE ");
   attroff(A_BOLD | A_REVERSE);
 }
 
 // Drucken der Eingabetipps am linken Rand
-void print_controls() {
+void print_controls(void) {
   attron(A_REVERSE);
   mvprintw(4, 9, "CONTROLS");
   attroff(A_REVERSE);
