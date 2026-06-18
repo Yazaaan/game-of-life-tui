@@ -32,12 +32,17 @@ clean:
 
 # Tests
 
-test: test_engine.o engine.o unity.o
+test: test_engine.o test_savefile.o engine.o savefile.o unity.o
 	gcc test_engine.o engine.o unity.o -o test_engine $(LDFLAGS)
+	gcc test_savefile.o engine.o savefile.o unity.o -o test_savefile $(LDFLAGS)
 	./test_engine
+	./test_savefile
 
 test_engine.o: tests/test_engine.c include/engine.h
 	gcc $(CFLAGS) -c tests/test_engine.c -o test_engine.o
+
+test_savefile.o: tests/test_savefile.c include/engine.h include/savefile.h
+	gcc $(CFLAGS) -c tests/test_savefile.c -o test_savefile.o
 
 unity.o: lib/unity/unity.c lib/unity/unity.h lib/unity/unity_internals.h
 	gcc $(CFLAGS) -c lib/unity/unity.c -o unity.o
