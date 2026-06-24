@@ -109,7 +109,7 @@ void verifyTest(void);
 #endif
 
 /* It is not necessary for you to call PASS. A PASS condition is assumed if nothing fails.
- * This method allows you to abort a test immediately with a PASS game, ignoring the remainder of the test. */
+ * This method allows you to abort a test immediately with a PASS state, ignoring the remainder of the test. */
 #define TEST_PASS()                                                                                TEST_ABORT()
 #define TEST_PASS_MESSAGE(message)                                                                 do { UnityMessage((message), __LINE__); TEST_ABORT(); } while (0)
 

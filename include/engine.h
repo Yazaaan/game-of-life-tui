@@ -13,23 +13,25 @@
 
 // Dieses Struct enhält die Spielfläche mit den Zellen sowie wichtige
 // Eigenschaften und wird weil es alles enthält "Universum" genannt.
-typedef struct {
-  bool *grid;
-  int width;
-  int height;
-  bool variable_dimension;
-  int cells_alive;
-  long frame_count;
+typedef struct
+{
+    bool *grid;
+    int width;
+    int height;
+    bool variable_dimension;
+    int cells_alive;
+    long frame_count;
 } Universe;
 
 // Dieses Struct speichert die Spieleinstellungen und enthält ein eingenes
 // Universum
-typedef struct {
-  Universe *universe;
-  bool running;
-  bool play;
-  int simulation_speed;
-  bool save_mode;
+typedef struct
+{
+    Universe *universe;
+    bool running;
+    bool play;
+    int simulation_speed;
+    bool save_mode;
 } Game_State;
 
 bool get_cell_state(Universe *universe, int y, int x);

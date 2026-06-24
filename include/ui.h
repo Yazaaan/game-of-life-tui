@@ -9,8 +9,8 @@
 extern char global_message[128];
 
 #define set_message(...)                                                       \
-  snprintf(global_message, sizeof(global_message),                             \
-           __VA_ARGS__) // Danke Gemini :)
+    snprintf(global_message, sizeof(global_message),                           \
+             __VA_ARGS__) // Danke Gemini :)
 
 void ui_init(Game_State *game);
 
