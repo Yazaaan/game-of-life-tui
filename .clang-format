@@ -1,0 +1,25 @@
+# Basierend auf den Guidelines für Systemprogrammierung 1 (SoSe 2026)
+Language: Cpp
+BasedOnStyle: LLVM
+
+# 1. Ausführungsblöcke: Geschweifte Klammern in eigener Zeile
+BreakBeforeBraces: Allman
+AllowShortFunctionsOnASingleLine: None
+
+# 2. Einrückung: Nur Leerzeichen, keine Tabulatoren
+UseTab: Never
+IndentWidth: 4
+TabWidth: 4
+
+# 3. Zeilenlänge: Jede Zeile sollte nicht länger als 80 Zeichen sein
+ColumnLimit: 80
+
+# Zusätzliche Einstellungen für sauberen C-Code (entsprechend den Folien)
+# Sicherstellen, dass Pointer-Alignment sauber ist (z.B. int *p;)
+PointerAlignment: Right
+
+# Leerzeichen nach Casts (z.B. (int) x)
+SpaceAfterCStyleCast: true
+
+# Kontrolliert Leerzeichen vor Klammern sauber (z.B. if (x), aber funktion())
+SpaceBeforeParens: ControlStatements
