@@ -1,18 +1,17 @@
 #ifndef ENGINE
 #define ENGINE
 
-// Ob eine Zelle lebendig oder tot ist soll durch einen bool repräsentiert
-// werden. In C gibt es zwar kein bool, aber hiermit wird die Lesbarkeit des
-// Codes verbessert.
+// Whether a cell is alive or dead should be represented by a bool. Although
+// there is no bool in C, using one here improves the readability of the code.
 #include <stdbool.h>
 
-// Um die Übersicht weiter zu erhöhen weden zwei defines für tot und lebendig
-// eingeführt
+// To make things even clearer, two defines are introduced for “dead” and
+// “alive”
 #define ALIVE true
 #define DEAD false
 
-// Dieses Struct enhält die Spielfläche mit den Zellen sowie wichtige
-// Eigenschaften und wird weil es alles enthält "Universum" genannt.
+// This struct contains the game board with its cells as well as important
+// properties, and is called “Universe” because it contains everything.
 typedef struct
 {
     bool *grid;
@@ -23,8 +22,7 @@ typedef struct
     long frame_count;
 } Universe;
 
-// Dieses Struct speichert die Spieleinstellungen und enthält ein eingenes
-// Universum
+// This struct stores the game settings and contains its own universe
 typedef struct
 {
     Universe *universe;

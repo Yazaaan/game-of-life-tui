@@ -3,14 +3,14 @@
 
 #include "engine.h"
 
-// Ersetzt snprintf durch set_message für die Lesbarkeit
+// Replaces `snprintf` with `set_message` for readability
 #include <stdio.h>
 
 extern char global_message[128];
 
 #define set_message(...)                                                       \
     snprintf(global_message, sizeof(global_message),                           \
-             __VA_ARGS__) // Danke Gemini :)
+             __VA_ARGS__) // Thanks Gemini :)
 
 void ui_init(Game_State *game);
 

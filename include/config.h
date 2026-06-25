@@ -1,5 +1,4 @@
-// In dieser Datei werden Konstatnten für das Programm
-// definiert
+// This file defines constants for the program
 #define GRID_START_X 28
 #define GRID_START_Y 4
 #define GRID_MARGIN_X 18

@@ -14,7 +14,7 @@ char *controls[][2] = {{"q", "quit"},
                        {"h", "toggle universe scaling"},
                        {"left mouse button", "edit individual cells"}};
 
-// Drucken der Überschrift
+// Print the heading
 void print_headline(void)
 {
     attron(A_BOLD | A_REVERSE);
@@ -22,7 +22,7 @@ void print_headline(void)
     attroff(A_BOLD | A_REVERSE);
 }
 
-// Drucken der Eingabetipps am linken Rand
+// Print the tooltips on the left side
 void print_controls(void)
 {
     attron(A_REVERSE);
@@ -38,14 +38,14 @@ void print_controls(void)
             break;
         }
         attron(A_BOLD | COLOR_PAIR(1));
-        mvprintw(line++, 1, "%s:", controls[i][0]); // Taste
+        mvprintw(line++, 1, "%s:", controls[i][0]); // key
         attroff(A_BOLD | COLOR_PAIR(1));
-        mvprintw(line++, 2, "%s", controls[i][1]); // Erklärung
+        mvprintw(line++, 2, "%s", controls[i][1]); // explanation
         line++;
     }
 }
 
-// Drucken der Statistiken am rechten Rand
+// Print the statistics on the right side
 void print_stats(Game_State *game)
 {
     attron(A_REVERSE);
@@ -93,27 +93,28 @@ void print_stats(Game_State *game)
              game->universe->height);
 }
 
-// Drucken der Trennlinien zwischen den UI-Elementen
+// Print the separator lines between the UI elements
 void print_dividers(void)
 {
     attron(COLOR_PAIR(2));
-    // Horizontale Line unter Überschrift
+    // Horizontal line under the heading
     for (int i = 0; i <= COLS; i++)
     {
         mvprintw(3, i, "-");
     }
-    // Horizontale Line unter Universum
+    // Horizontal line below the universe
     int line_hight = LINES - GRID_MARGIN_Y;
     for (int i = 0; i <= COLS; i++)
     {
         mvprintw(line_hight, i, "-");
     }
-    // Verticale Linie links
+    // Vertical line on the left
     int line_pos_x = GRID_START_X - 1;
     for (int i = 4; i < line_hight; i++)
     {
         mvprintw(i, line_pos_x, "|");
     }
+    // Vertical line on the right
     line_pos_x = COLS - GRID_MARGIN_X;
     for (int i = 4; i < line_hight; i++)
     {
@@ -122,13 +123,13 @@ void print_dividers(void)
     attroff(COLOR_PAIR(2));
 }
 
-// Die Universumsgrenze zeichnen
+// Draw the boundary of the universe
 void print_universe_border(Universe *universe, int offset_y, int offset_x,
                            int margin_y, int margin_x)
 {
     attron(COLOR_PAIR(3));
 
-    // Rechte Wand
+    // Right wall
     if (COLS > offset_x + universe->width + margin_x)
     {
         for (int y = offset_y;
@@ -137,7 +138,7 @@ void print_universe_border(Universe *universe, int offset_y, int offset_x,
             mvaddch(y, offset_x + universe->width, '<');
         }
     }
-    // Untere Wand
+    // Bottom wall
     if (LINES > offset_y + universe->height + margin_y)
     {
         for (int x = offset_x;
@@ -149,7 +150,7 @@ void print_universe_border(Universe *universe, int offset_y, int offset_x,
     attroff(COLOR_PAIR(3));
 }
 
-// Spielfeld zeichnen
+// Draw the universe
 void print_universe(Universe *universe, int offset_y, int offset_x,
                     int margin_y, int margin_x)
 {
@@ -167,14 +168,14 @@ void print_universe(Universe *universe, int offset_y, int offset_x,
         }
     }
 
-    // Bei fixer Universumgröße eine Begrenzung zeichnen
+    // Draw a boundary when the universe size is fixed
     if (!universe->variable_dimension)
     {
         print_universe_border(universe, offset_y, offset_x, margin_y, margin_x);
     }
 }
 
-// Informationszeile am unteren Rand
+// Message bar at the bottom
 void print_message(int pos_y, int pos_x, char msg[])
 {
     attron(COLOR_PAIR(4));

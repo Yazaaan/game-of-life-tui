@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-// Speichern eiens Universums in eine Datei (Slots wählbar)
+// Save a universe to a file (slots can be selected)
 int save_grid(Universe *universe, int slot)
 {
     if (universe == NULL)
@@ -34,6 +34,7 @@ int save_grid(Universe *universe, int slot)
     return 0;
 }
 
+// Load grid into universe from file
 int load_grid(Universe **universe_ptr, int slot)
 {
     if (universe_ptr == NULL || *universe_ptr == NULL)
@@ -73,7 +74,6 @@ int load_grid(Universe **universe_ptr, int slot)
         return 1;
     }
 
-    // reset_universe(universe, height, width);
     resize_universe(universe_ptr, height, width);
 
     Universe *universe = *universe_ptr;

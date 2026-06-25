@@ -1,6 +1,6 @@
 #include <time.h>
 
-// millis()-Funktion wie beim Arduino
+// `millis()` function, just like on the Arduino
 long long millis(void)
 {
     struct timespec ts;

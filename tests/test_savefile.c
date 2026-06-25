@@ -1,4 +1,3 @@
-
 #include "../include/engine.h"
 #include "../include/savefile.h"
 #include "../lib/unity/unity.h"
@@ -6,7 +5,7 @@
 
 Universe *test_universe = NULL;
 
-// --- Setup und Teardown ---
+// --- Setup and Teardown ---
 
 void setUp(void)
 {
@@ -24,50 +23,50 @@ void tearDown(void)
 
 // --- Tests ---
 
-// Speichern und anschließendes Laden
+// Saving and subsequent loading
 void test_save_and_load(void)
 {
-    // Vorbereitung: Ein Muster im Universum erstellen
+    // Preparation: Create a pattern in the universe
     change_cell(test_universe, 0, 0, ALIVE);
     change_cell(test_universe, 4, 4, ALIVE);
     int slot = 9;
-    // Aufräumen: Test-Dateien nach jedem Test löschen
+    // Cleanup: Delete test files after each test
 
-    // Schritt 1: Speichern
+    // Step 1: Save
     int save_result = save_grid(test_universe, slot);
     TEST_ASSERT_EQUAL_INT(0, save_result);
 
-    // Schritt 2: Ein zweites, leeres Universum erstellen, um es zu befüllen
+    // Step 2: Create a second, empty universe to populate it
     Universe *loading_universe = get_empty_universe(2, 2, true);
 
-    // Schritt 3: Laden
+    // Step 3: Load
     int load_result = load_grid(&loading_universe, slot);
     TEST_ASSERT_EQUAL_INT(0, load_result);
 
-    // Schritt 4: Überprüfung der Dimensionen und Inhalte
+    // Step 4: Verification of dimensions and content
     TEST_ASSERT_EQUAL_INT(5, loading_universe->height);
     TEST_ASSERT_EQUAL_INT(5, loading_universe->width);
     TEST_ASSERT_TRUE(get_cell_state(loading_universe, 0, 0));
     TEST_ASSERT_TRUE(get_cell_state(loading_universe, 4, 4));
     TEST_ASSERT_FALSE(
-        get_cell_state(loading_universe, 1, 1)); // Prüfen, ob Rest leer ist
+        get_cell_state(loading_universe, 1, 1)); // Check if the rest is empty
 
     destroy_universe(loading_universe);
 }
 
-// Fehlerfall: Speichern eines NULL-Pointers
+// Error case: Saving a NULL pointer
 void test_save_grid_null(void)
 {
     int result = save_grid(NULL, 1);
     TEST_ASSERT_EQUAL_INT(1, result);
 }
 
-// Fehlerfall: Laden eines ungültigen Slots (> 11)
+// Error case: Loading an invalid slot (> 11)
 void test_load_grid_invalid_slot(void)
 {
     Universe *temp_universe = get_empty_universe(3, 3, true);
     int result =
-        load_grid(&temp_universe, 99); // Slot 99 existiert nicht im Code
+        load_grid(&temp_universe, 99); // Slot 99 does not exist in the code
     TEST_ASSERT_EQUAL_INT(1, result);
     destroy_universe(temp_universe);
 }

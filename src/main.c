@@ -7,11 +7,10 @@
 
 int main(void)
 {
-    Game_State
-        game; // Erstellen eines neuen Spiels. Hier drinn wird alles passieren!
-    long long last_update =
-        0; // Hilfsvariable für die millis()-Funktion.
-           // Speichert Zeitpunkt der letzten Aktualisierung.
+    // Creating a new game. This is where it's all going to happen!
+    Game_State game;
+    long long last_update = 0; // Helper variable for the millis() function.
+                               // Stores the time of the last update.
 
     ui_init(&game);
 
@@ -34,11 +33,11 @@ int main(void)
             }
         }
 
-        usleep(1000); // Eine Millisekunde warten, damit Schleife nicht konstant
-                      // durchrast.
+        usleep(1000); // Wait one millisecond, so the loop doesn't run
+                      // continuously.
     }
 
     ui_cleanup();
-    destroy_universe(game.universe); // Speicher freigeben
+    destroy_universe(game.universe); // Free up memory
     return EXIT_SUCCESS;
 }
