@@ -5,6 +5,11 @@ saves/*
 !saves/welcome.universe
 !saves/glider_gun.universe
 
+# Ausführbare Dateien ausnehmen
+game_of_life
+test_engine
+test_savefile
+
 # Prerequisites
 *.d
 
