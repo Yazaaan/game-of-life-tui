@@ -7,7 +7,7 @@
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
-inline bool get_cell_state(Universe *universe, int y, int x)
+inline bool get_cell_state(const Universe *universe, int y, int x)
 {
     if ((unsigned int) y >= universe->height ||
         (unsigned int) x >= universe->width)
@@ -105,7 +105,7 @@ void fill_universe_random(Universe *universe, int probability_percent)
 }
 
 // Counts the neighbors around a cell and returns the result
-int count_neighbours(Universe *universe, int y, int x)
+int count_neighbours(const Universe *universe, int y, int x)
 {
     if (universe == NULL)
         return 0;

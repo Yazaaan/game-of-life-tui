@@ -17,7 +17,7 @@ typedef struct
     bool *grid;
     int width;
     int height;
-    bool variable_dimension;
+    bool variable_dimension:1;
     int cells_alive;
     long frame_count;
 } Universe;
@@ -26,13 +26,13 @@ typedef struct
 typedef struct
 {
     Universe *universe;
-    bool running;
-    bool play;
+    bool running:1;
+    bool play:1;
     int simulation_speed;
-    bool save_mode;
+    bool save_mode:1;
 } Game_State;
 
-bool get_cell_state(Universe *universe, int y, int x);
+bool get_cell_state(const Universe *universe, int y, int x);
 
 Universe *get_empty_universe(int height, int width, bool variable_dimension);
 
@@ -40,7 +40,7 @@ void reset_universe(Universe *universe);
 
 void fill_universe_random(Universe *universe, int probability_percent);
 
-int count_neighbours(Universe *universe, int y, int x);
+int count_neighbours(const Universe *universe, int y, int x);
 
 void change_cell(Universe *universe, int y, int x, bool state);
 
