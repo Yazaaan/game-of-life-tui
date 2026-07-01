@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -Iinclude
 LDFLAGS = -lncurses
 
-.PHONY: all compile test
+.PHONY: all compile clean test
 
 all: compile test
 
@@ -30,6 +30,7 @@ savefile.o: src/savefile.c include/savefile.h
 
 clean:
 	rm -f *.o game_of_life test_engine test_savefile
+
 
 # Tests
 
