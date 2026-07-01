@@ -226,6 +226,7 @@ void resize_universe(Universe **universe_ptr, int new_height, int new_width)
 
     // Free memory
     destroy_universe(old_universe);
+    old_universe = NULL;
 
     *universe_ptr = new_universe;
 }
@@ -233,6 +234,9 @@ void resize_universe(Universe **universe_ptr, int new_height, int new_width)
 // Free up memory when a universe is no longer needed
 void destroy_universe(Universe *universe)
 {
+    if (universe == NULL)
+        return;
     free(universe->grid);
+    universe->grid = NULL;
     free(universe);
 }

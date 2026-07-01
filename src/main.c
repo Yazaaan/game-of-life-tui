@@ -39,5 +39,7 @@ int main(void)
 
     ui_cleanup();
     destroy_universe(game.universe); // Free up memory
+    game.universe = NULL;
+
     return EXIT_SUCCESS;
 }
